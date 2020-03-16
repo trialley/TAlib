@@ -9,3 +9,5 @@ out/
 www/
 WebServer
 log.txt
+library/
+bin/

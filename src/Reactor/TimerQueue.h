@@ -1,9 +1,9 @@
 #ifndef _NET_TIMERQUEUE_HH
 #define _NET_TIMERQUEUE_HH
-#include "TimerId.hpp"
-#include <common/CallBacks.hpp>
- #include <Logger/TimeStamp.hpp>
-#include <Reactor/Channel.hpp>
+#include "TimerId.h"
+#include <common/CallBacks.h>
+ #include <Logger/TimeStamp.h>
+#include <Reactor/Channel.h>
 #include <set>
 #include <vector>
 

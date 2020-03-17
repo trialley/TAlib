@@ -2,8 +2,8 @@
 #define _LOGGER_HH
 
 #include <string.h>
-#include "LogStream.hpp"
- #include <Logger/TimeStamp.hpp>
+#include "LogStream.h"
+ #include <Logger/TimeStamp.h>
 
 // CAUTION: do not write:
 //

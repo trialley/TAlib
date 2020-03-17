@@ -18,7 +18,7 @@ set(LOGGER__DIRECTORY ${SOURCES_DIRECTORY}/Logger)
 foreach(dir ${LOGGER__DIRECTORY})
   # get directory sources and headers
   file(GLOB s_${dir} "${dir}/*.cpp")
-  file(GLOB h_${dir} "${dir}/*.hpp")
+  file(GLOB h_${dir} "${dir}/*.h")
 
   # set muiduo_network sources
   set(logger_sources ${s_${dir}} ${h_${dir}})
@@ -32,13 +32,13 @@ set(TALIB__DIRECTORY ${SOURCES_DIRECTORY}/)
 foreach(dir ${TALIB__DIRECTORY})
   # get directory sources and headers
   file(GLOB s_${dir} "${dir}/*/*.cpp")
-  file(GLOB h_${dir} "${dir}/*.hpp")
+  file(GLOB h_${dir} "${dir}/*.h")
 
   # set muiduo_network sources
   set(talib_sources ${s_${dir}} ${h_${dir}})
 endforeach()
 add_library(TAlib ${talib_sources})
-target_link_libraries(TAlib pthread)
+target_link_libraries(TAlib pthread tcmalloc)
 # ≤‚ ‘≥Ã–Ú≤ø∑÷
 
 add_subdirectory(${EXAMPLE_DIRECTORY}/)

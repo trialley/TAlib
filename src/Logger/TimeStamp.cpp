@@ -1,5 +1,5 @@
 #include <sys/time.h>
- #include <Logger/TimeStamp.hpp>
+ #include <Logger/TimeStamp.h>
 #include <inttypes.h>
 
 TimeStamp TimeStamp::now(){

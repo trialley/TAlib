@@ -4,8 +4,8 @@
 #include <functional>
 #include <mutex>
 
-#include <Logger/Condition.hpp>
-#include <Logger/Thread.hpp>
+#include <Logger/Condition.h>
+#include <Logger/Thread.h>
 
 namespace muduo {
 

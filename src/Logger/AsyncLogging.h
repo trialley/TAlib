@@ -5,10 +5,10 @@
 #include <mutex>
 #include <string>
 
-#include <Logger/Thread.hpp>
-#include "LogStream.hpp"
-#include <Logger/ptr_vector.hpp>
-#include <Logger/Condition.hpp>
+#include <Logger/Thread.h>
+#include "LogStream.h"
+#include <Logger/ptr_vector.h>
+#include <Logger/Condition.h>
 
 class AsyncLogging
 {

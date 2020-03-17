@@ -1,5 +1,5 @@
-#include "AsyncLogging.hpp"
-#include "LogFile.hpp"
+#include "AsyncLogging.h"
+#include "LogFile.h"
 #include <assert.h>
 #include <stdio.h>
 

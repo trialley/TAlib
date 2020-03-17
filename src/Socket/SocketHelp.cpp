@@ -1,6 +1,6 @@
-#include <Socket/SocketHelp.hpp>
-#include <Logger/Logger.hpp>
-#include <common/Endian.hpp>
+#include <Socket/SocketHelp.h>
+#include <Logger/Logger.h>
+#include <common/Endian.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>

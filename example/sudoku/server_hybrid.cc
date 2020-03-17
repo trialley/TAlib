@@ -10,7 +10,7 @@
 #include "muduo/net/TcpServer.h"
 #include "muduo/net/inspect/Inspector.h"
 
-#include <boost/circular_buffer.hpp>
+#include <boost/circular_buffer.h>
 
 //#include <stdio.h>
 //#include <unistd.h>

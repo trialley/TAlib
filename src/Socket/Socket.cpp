@@ -3,10 +3,10 @@
 #include <strings.h>
 #include <stdio.h>
 
-#include "InetAddress.hpp"
-#include "Socket.hpp"
-#include <Logger/Logger.hpp>
-#include <Socket/SocketHelp.hpp>
+#include "InetAddress.h"
+#include "Socket.h"
+#include <Logger/Logger.h>
+#include <Socket/SocketHelp.h>
 
 Socket::~Socket()
 {

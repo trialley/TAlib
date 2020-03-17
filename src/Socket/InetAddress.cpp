@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <stddef.h>
 
-#include "InetAddress.hpp"
-#include <Socket/SocketHelp.hpp>
-#include <common/Endian.hpp>
+#include "InetAddress.h"
+#include <Socket/SocketHelp.h>
+#include <common/Endian.h>
 
 
 // INADDR_ANY use (type)value casting.

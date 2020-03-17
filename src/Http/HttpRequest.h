@@ -1,5 +1,5 @@
 #pragma once
-#include <Logger/TimeStamp.hpp>
+#include <Logger/TimeStamp.h>
 
 #include <assert.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
-#include "Buffer.hpp"
-#include <Socket/SocketHelp.hpp>
+#include "Buffer.h"
+#include <Socket/SocketHelp.h>
 
 /*#include <sys/uio.h>
 #include <iostream>*/

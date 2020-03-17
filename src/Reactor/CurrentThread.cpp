@@ -1,4 +1,4 @@
-#include <Reactor/CurrentThread.hpp>
+#include <Reactor/CurrentThread.h>
 
 namespace CurrentThread
 {

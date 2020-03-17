@@ -1,5 +1,5 @@
-#include "LogFile.hpp"
-#include "FileUtil.hpp"
+#include "LogFile.h"
+#include "FileUtil.h"
 #include <time.h>
 #include <string.h>
 #include <dirent.h>

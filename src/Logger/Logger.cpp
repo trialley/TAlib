@@ -1,4 +1,4 @@
-#include <Logger/Logger.hpp>
+#include <Logger/Logger.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
- #include <Logger/TimeStamp.hpp>
+ #include <Logger/TimeStamp.h>
 
 __thread char t_time[64];
 __thread time_t t_lastSecond;

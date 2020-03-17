@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <algorithm>
-#include "LogStream.hpp"
+#include "LogStream.h"
 
 
 LogStream::LogStream(){

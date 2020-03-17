@@ -7,8 +7,8 @@
 // Author: Shuo Chen (chenshuo at chenshuo dot com)
 //
 
-#include <common/Buffer.hpp>
-#include "HttpContext.hpp"
+#include <common/Buffer.h>
+#include "HttpContext.h"
 
 using namespace muduo;
 using namespace http;

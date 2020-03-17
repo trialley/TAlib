@@ -2,7 +2,7 @@
 #define _LOG_FILE_HH
 #include <string>
 #include <mutex>
-#include "scoped_ptr.hpp"
+#include "scoped_ptr.h"
 
 namespace FileUtil{
 	class AppendFile;

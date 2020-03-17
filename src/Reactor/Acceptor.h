@@ -2,8 +2,8 @@
 #define _NET_ACCEPTOR_HH
 #include <functional>
 
-#include <Reactor/Channel.hpp>
-#include <Socket/Socket.hpp>
+#include <Reactor/Channel.h>
+#include <Socket/Socket.h>
 
 class EventLoop;
 class InetAddress;

@@ -1,4 +1,4 @@
-#include <Logger/Thread.hpp>
+#include <Logger/Thread.h>
 
 Thread::Thread(const ThreadFunc& threadRoutine)
     : m_isStarted(false),

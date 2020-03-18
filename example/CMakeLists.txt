@@ -57,4 +57,10 @@ add_executable(mysql_pool_example ${SOURCES_DIRECTORY}/mysql_pool_example.cpp)
 target_link_libraries(mysql_pool_example    
 								            TAlib mysqlclient 
                                             pthread
-                                           )
+										   )
+
+add_executable(redis_pool_example ${SOURCES_DIRECTORY}/redis_pool_example.cpp)
+target_link_libraries(redis_pool_example    
+										TAlib 
+										pthread
+										)

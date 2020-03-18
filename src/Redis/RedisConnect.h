@@ -1,6 +1,4 @@
-#ifndef REDIS_CONNECT_H
-#define REDIS_CONNECT_H
-///////////////////////////////////////////////////////////////
+#pragma once
 #include "ResPool.h"
 
 #ifdef _MSC_VER
@@ -715,7 +713,7 @@ class RedisConnect {
   static shared_ptr<RedisConnect> Instance() {
     return GetTemplate()->grasp();
   }
-  static void Setup(const string& host, int port, const string& passwd = "", int timeout = 3000, int memsz = 2 * 1024 * 1024) {
+  static void Setup(const string& host = "127.0.0.1", int port = 6379, const string& passwd = "", int timeout = 3000, int memsz = 2 * 1024 * 1024) {
 #ifndef _MSC_VER
     signal(SIGPIPE, SIG_IGN);
 #else
@@ -734,6 +732,3 @@ class RedisConnect {
 
 int RedisConnect::POOL_MAXLEN = 8;
 int RedisConnect::SOCKET_TIMEOUT = 10;
-
-///////////////////////////////////////////////////////////////
-#endif

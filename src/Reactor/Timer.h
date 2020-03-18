@@ -2,7 +2,7 @@
 #define _NET_TIMER_HH
 
 #include <common/CallBacks.h>
- #include <Logger/TimeStamp.h>
+ #include <common/TimeStamp.h>
 #include <common/Atomic.h>
 
 namespace TA {

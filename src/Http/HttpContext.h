@@ -6,7 +6,6 @@ namespace TA {
   class Buffer;
 }
 
-namespace http { 
 
 class HttpContext
 {
@@ -52,5 +51,4 @@ class HttpContext
   HttpRequest request_;
 };
 
-}  // namespace http
 

@@ -11,7 +11,6 @@
 #include "HttpContext.h"
 
 using namespace TA;
-using namespace http;
 
 bool HttpContext::processRequestLine(const char* begin, const char* end)
 {

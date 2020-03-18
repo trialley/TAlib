@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 using namespace TA;
-using namespace http;
+
 
 void HttpResponse::appendToBuffer(Buffer* output) const
 {

@@ -155,7 +155,7 @@ void TcpConnection::handleRead() {
 
   ssize_t n = m_inputBuffer.readFd(p_channel->fd(), &savedErrno);
   if (n > 0) {
-    m_messageCallBack(shared_from_this(), &m_inputBuffer, n);
+    m_messageCallBack(shared_from_this(), &m_inputBuffer, TimeStamp());
   } else if (n == 0) {
     handleClose();
   } else {

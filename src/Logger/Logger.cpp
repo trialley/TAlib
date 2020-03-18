@@ -1,5 +1,5 @@
 #include <Logger/Logger.h>
-#include <Logger/TimeStamp.h>
+#include <common/TimeStamp.h>
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -81,10 +81,25 @@ void defaultOutput(const char* msg, int len) {
 void defaultFlush() {
   fflush(stdout);
 }
+void asyncOutput (const char* msg, int len) {
+    size_t n = fwrite (msg, 1, len, stdout);
+    (void)n;
+}
 
+void asyncFlush () {
+    fflush (stdout);
+}
 Logger::outputFunc g_output = defaultOutput;
 Logger::flushFunc g_flush = defaultFlush;
-
+void Logger::setAsync (bool isas) {
+    if (isas) {
+        Logger::setOutput (asyncOutput);
+        Logger::setFlush (asyncFlush);
+    } else {
+        Logger::setOutput (defaultOutput);
+        Logger::setFlush (defaultFlush);
+    }
+}
 void Logger::setOutput(outputFunc out) {
   g_output = out;
 }

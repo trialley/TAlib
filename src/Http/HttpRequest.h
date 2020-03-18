@@ -1,11 +1,11 @@
 #pragma once
-#include <Logger/TimeStamp.h>
+#include <common/TimeStamp.h>
 
 #include <assert.h>
 #include <stdio.h>
 #include <map>
 
-namespace http {
+
 
 class HttpRequest {
  public:
@@ -136,5 +136,3 @@ class HttpRequest {
   TimeStamp receiveTime_;
   std::map<std::string, std::string> headers_;
 };
-
-}  // namespace http

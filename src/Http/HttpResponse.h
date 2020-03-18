@@ -6,8 +6,6 @@ namespace TA {
     class Buffer;
 }
 
-namespace http
-{
 
     class HttpResponse {
     public:
@@ -63,5 +61,4 @@ namespace http
         std::string body_;
     };
 
-}  // namespace http
 

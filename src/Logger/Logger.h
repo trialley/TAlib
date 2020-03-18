@@ -1,7 +1,7 @@
 #ifndef _LOGGER_HH
 #define _LOGGER_HH
 
-#include <Logger/TimeStamp.h>
+#include <common/TimeStamp.h>
 #include <string.h>
 #include "LogStream.h"
 
@@ -41,7 +41,7 @@ class Logger {
 
   static void setLogLevel(LogLevel level);
   static LogLevel getLogLevel();
-
+  static void setAsync (bool);
   LogStream& stream() { return _stream; }
 
   typedef void (*outputFunc)(const char* msg, int len);

@@ -2,7 +2,7 @@
 #define _NET_TIMERQUEUE_HH
 #include "TimerId.h"
 #include <common/CallBacks.h>
- #include <Logger/TimeStamp.h>
+ #include <common/TimeStamp.h>
 #include <Reactor/Channel.h>
 #include <set>
 #include <vector>

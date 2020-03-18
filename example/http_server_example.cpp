@@ -1,21 +1,25 @@
-#include <async_logging>
-#include <muduo_server>
+#include <Logger/Logger.h>
+#include <Reactor/Reactor.h>
+#include <Tcp/TcpServer.h>
+#include <Http/HttpContext.h>
+#include <Http/HttpResponse.h>
+#include <Http/HttpServer.h>
+#include<string>
+using namespace std;
+//#include <Http/HttpResponse.h>
 
-#include <HttpContext.h>
-#include <HttpResponse.h>
-
-void on_connection(const muduo::TcpConnectionPtr& conn) {
+void on_connection(const TA::TcpConnectionPtr& conn) {
   LOG_DEBUG << "new conn from " << conn->peerAddress().toIpPort();
 }
 
-void onRequest(const muduo::TcpConnectionPtr& conn, const http::HttpRequest& req) {
+void onRequest(const TA::TcpConnectionPtr& conn, const HttpRequest& req) {
   const std::string& connection = req.getHeader("Connection");
   bool close = connection == "close" || connection == "Close" ||
-               (req.getVersion() == http::HttpRequest::kHttp10 && connection != "Keep-Alive");
-  http::HttpResponse response(close);
-  response.setStatusCode(http::HttpResponse::k200Ok);
+               (req.getVersion() == HttpRequest::kHttp10 && connection != "Keep-Alive");
+  HttpResponse response(close);
+  response.setStatusCode(HttpResponse::k200Ok);
   response.setBody("welcome!\n");
-  muduo::Buffer buf;
+  TA::Buffer buf;
   response.appendToBuffer(&buf);
   LOG_DEBUG << "http buffer :\n"
             << buf.peek();
@@ -25,12 +29,12 @@ void onRequest(const muduo::TcpConnectionPtr& conn, const http::HttpRequest& req
   }
 }
 
-void on_message(const muduo::TcpConnectionPtr& conn, muduo::Buffer* buffer, ssize_t len) {
+void on_message(const TA::TcpConnectionPtr& conn, TA::Buffer* buffer, ssize_t len) {
   LOG_DEBUG << "on message : " << len << " bytes " << buffer->peek();
 
   LOG_TRACE << "readAbleBytes:" << buffer->readableBytes() << " len:" << len;
 
-  http::HttpContext context;
+ HttpContext context;
 
   if (!context.parseRequest(buffer, TimeStamp::now())) {
     conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
@@ -51,14 +55,18 @@ void on_message(const muduo::TcpConnectionPtr& conn, muduo::Buffer* buffer, ssiz
 int main() {
   Logger::setLogLevel(Logger::TRACE);
 
-  muduo::EventLoop loop;
+  TA::EventLoop loop;
 
   InetAddress localAddr(8080);
-  muduo::TcpServer tcp_server(&loop, localAddr);
+  //TA::TcpServer tcp_server(&loop, localAddr);
 
-  tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
-  tcp_server.setMessageCallBack(std::bind(on_message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-  tcp_server.start();
+  //tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
+  //tcp_server.setMessageCallBack(std::bind(on_message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+  //tcp_server.startListen();
+
+  TA::HttpServer  httpserver(&loop, localAddr,string("test"));
+  //httpserver.setHttpCallback ();
+  httpserver.start ();
 
   loop.loop();
 }

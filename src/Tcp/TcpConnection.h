@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <string>
-
+#include<Http/HttpContext.h>
 #include <Socket/InetAddress.h>
 #include <Socket/Socket.h>
 #include <common/CallBacks.h>
@@ -49,7 +49,14 @@ public:
   bool isConnected() const { return m_state == kConnected; }
   bool isDisConnected() const { return m_state == kDisConnected; }
   const char* stateToString() const;
+  HttpContext* _context;
+  void setContext (HttpContext* context) {
+      _context = context;
+  }
 
+  HttpContext* getContext () const {
+      return _context;
+  }
 private:
   enum StateE { kDisConnected, kConnecting, kDisConnecting, kConnected, };
 

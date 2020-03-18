@@ -9,20 +9,12 @@
 
 #include<Tcp/TcpServer.h>
 #include <Http/HttpServer.h>
-
-#include <Http/HttpContext.h>
-#include <Http/HttpRequest.h>
-#include <Http/HttpResponse.h>
-#include <Logger/AsyncLogging.h>
+#include <Logger/Logger.h>
 #include <common/noncopyable.h>
 #include <string>
+#include<functional>
 using namespace TA;
-using namespace http;
 using namespace std;
-class HttpResponse;
-namespace TA {
-namespace net {
-namespace detail {
 
 void defaultHttpCallback(const HttpRequest&, HttpResponse* resp) {
   resp->setStatusCode(HttpResponse::k404NotFound);
@@ -30,38 +22,36 @@ void defaultHttpCallback(const HttpRequest&, HttpResponse* resp) {
   resp->setCloseConnection(true);
 }
 
-}  // namespace detail
-}  // namespace net
-}  // namespace TA
-
 HttpServer::HttpServer(EventLoop* loop,
                        const InetAddress& listenAddr,
-                       const string& name,
-                       TcpServer::Option option)
-    : server_(loop, listenAddr, name, option),
-      httpCallback_(detail::defaultHttpCallback) {
-  server_.setConnectionCallback(
-      std::bind(&HttpServer::onConnection, this, _1));
-  server_.setMessageCallback(
-      std::bind(&HttpServer::onMessage, this, _1, _2, _3));
+                       const string& name)
+    : server_(loop, listenAddr, name),
+      httpCallback_(defaultHttpCallback) {
+  server_.setConnectionCallBack (
+      std::bind(&HttpServer::onConnection, this, std::placeholders::_1));
+  server_.setMessageCallBack(
+      std::bind(&HttpServer::onMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+  ); 
 }
 
 void HttpServer::start() {
-  LOG_WARN << "HttpServer[" << server_.name()
-           << "] starts listenning on " << server_.ipPort();
-  server_.start();
+  LOG_WARN << "HttpServer[" << server_.getName ()
+           << "] starts listenning on " << server_.getipPort ();
+  server_.startListen();
 }
 
 void HttpServer::onConnection(const TcpConnectionPtr& conn) {
-  if (conn->connected()) {
-    conn->setContext(HttpContext());
+    LOG_INFO << "on connection";
+  if (conn->isConnected ()) {
+    conn->setContext(new HttpContext());
   }
 }
 
 void HttpServer::onMessage(const TcpConnectionPtr& conn,
-                           Buffer* buf,
-                           Timestamp receiveTime) {
-  HttpContext* context = boost::any_cast<HttpContext>(conn->getMutableContext());
+                           Buffer* buf, //ssize_t size,
+    TimeStamp receiveTime) {
+
+  HttpContext* context =(HttpContext*)(conn->_context);//TODOC++Ö¸Õë
 
   if (!context->parseRequest(buf, receiveTime)) {
     conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
@@ -75,6 +65,8 @@ void HttpServer::onMessage(const TcpConnectionPtr& conn,
 }
 
 void HttpServer::onRequest(const TcpConnectionPtr& conn, const HttpRequest& req) {
+    LOG_INFO << "on req";
+
   const string& connection = req.getHeader("Connection");
   bool close = connection == "close" ||
                (req.getVersion() == HttpRequest::kHttp10 && connection != "Keep-Alive");

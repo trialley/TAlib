@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <memory>
-
+#include<common/TimeStamp.h>
 //#include "TimeStamp.h>
 
 namespace TA {
@@ -19,7 +19,7 @@ namespace NetCallBacks
 
 typedef std::function<void()> TimerCallBack;
 typedef std::function<void(const TcpConnectionPtr& )> ConnectionCallBack;
-typedef std::function<void(const TcpConnectionPtr& , Buffer*, ssize_t )> MessageCallBack;
+typedef std::function<void(const TcpConnectionPtr& , Buffer*, TimeStamp )> MessageCallBack;
 typedef std::function<void(const TcpConnectionPtr& )> CloseCallBack;
 
 void defaultConnectionCallback();

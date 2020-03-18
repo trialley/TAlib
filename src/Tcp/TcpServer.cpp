@@ -17,7 +17,8 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& listenAddr, const std::
       _name(name),
       _threadPool(new EventLoopThreadPool(loop, name)),
       p_acceptor(new Acceptor(loop, listenAddr)),
-      m_nextConnId(1) {
+      m_nextConnId(1) ,
+    _ipPort(listenAddr.toIpPort()){
   p_acceptor->setNewConnectionCallBack(
       std::bind(&TcpServer::newConnetion, this, std::placeholders::_1, std::placeholders::_2));
 }
@@ -29,7 +30,7 @@ void TcpServer::setThreadNum(int numThreads) {
 TcpServer::~TcpServer() {
 }
 
-void TcpServer::start() {
+void TcpServer::startListen() {
   assert(!p_acceptor->listenning());
   _threadPool->start();
 

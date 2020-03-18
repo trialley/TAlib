@@ -1,0 +1,33 @@
+{
+	"type": "sys",
+	"sender": "hh1",
+	"message": {
+		"type": "login"
+	}
+}
+{
+	"type": "sys",
+	"sender": "hh2",
+	"message": {
+		"type": "login"
+	}
+}
+
+{
+	"type": "user",
+	"sender": "hh2",
+	"receiver":"hh1",
+	"message": {
+		"type": "text",
+		"content":"hello i am 2"
+	}
+}
+{
+	"type": "user",
+	"sender": "hh1",
+	"receiver":"hh2",
+	"message": {
+		"type": "text",
+		"content":"hello i am 1"
+	}
+}

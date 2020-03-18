@@ -1,57 +1,97 @@
 #include <Http/HttpContext.h>
 #include <Http/HttpResponse.h>
 #include <Http/HttpServer.h>
+#include <Http/Mimetype.h>
 #include <Logger/Logger.h>
 #include <Reactor/Reactor.h>
 #include <Tcp/TcpServer.h>
 #include <common/TimeStamp.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/epoll.h>
+#include <sys/eventfd.h>
+#include <sys/mman.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstdio>
+#include <cstring>
 #include <string>
+
 using namespace std;
 
 extern char favicon[555];
-bool benchmark = false;
+// std::map<string, TA::HttpServer::HttpCallback> router;
 
 void onRequest(const HttpRequest& req, HttpResponse* resp) {
   LOG_INFO << "Headers " << req.methodString() << " " << req.path();
-  if (!benchmark) {
+  if (1) {
     const std::map<string, string>& headers = req.headers();
     for (const auto& header : headers) {
       LOG_INFO << header.first << ": " << header.second;
     }
   }
-
-  if (req.path() == "/") {
-    resp->setStatusCode(HttpResponse::k200Ok);
-    resp->setStatusMessage("OK");
-    resp->setContentType("text/html");
-    resp->addHeader("Server", "Muduo");
+  string filepath = string("../www") + req.path ().c_str ();
+  LOG_INFO << filepath;
+  //   if (!(getCache().get(path, outbuffer))) {
+  int src_fd = open(filepath.c_str(), 0, 0);
+  struct stat sbuf;
+  if (stat(filepath.c_str(), &sbuf) == 0) {
+    int size = sbuf.st_size;
+    char* src_addr = (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, src_fd, 0);
+    string context(src_addr, size);
+    int dot_pos = req.path().rfind('.');
     string now = TimeStamp::now().toFormattedString(true);
-    resp->setBody(
-        "<html><head><title>This is title</title></head>"
-        "<body><h1>Hello</h1>Now is UTC " +
-        now +
-        "</body></html>");
-  } else if (req.path() == "/favicon.ico") {
+
     resp->setStatusCode(HttpResponse::k200Ok);
     resp->setStatusMessage("OK");
-    resp->setContentType("image/png");
-    resp->setBody(string(favicon, sizeof favicon));
-  } else if (req.path() == "/hello") {
-    resp->setStatusCode(HttpResponse::k200Ok);
-    resp->setStatusMessage("OK");
-    resp->setContentType("text/plain");
+    resp->setContentType(
+        Mimetype::getMime(req.path().substr(dot_pos)));
     resp->addHeader("Server", "Muduo");
-    resp->setBody("hello, world!\n");
-  } else {
-    resp->setStatusCode(HttpResponse::k404NotFound);
-    resp->setStatusMessage("Not Found");
-    resp->setCloseConnection(true);
+    resp->setBody(context);
+    munmap(src_addr, size);
+    close(src_fd);
   }
+  //   }
+
+  //   if (router.find(req.path()) != router.end()) {
+  //     router[req.path()](req, resp);
+  //   }
+  //   if (req.path() == "/") {
+  //     resp->setStatusCode(HttpResponse::k200Ok);
+  //     resp->setStatusMessage("OK");
+  //     resp->setContentType("text/html");
+  //     resp->addHeader("Server", "Muduo");
+  //     string now = TimeStamp::now().toFormattedString(true);
+  //     resp->setBody(
+  //         "<html><head><title>This is title</title></head>"
+  //         "<body><h1>Hello</h1>Now is UTC " +
+  //         now +
+  //         "</body></html>");
+  //   } else if (req.path() == "/favicon.ico") {
+  //     resp->setStatusCode(HttpResponse::k200Ok);
+  //     resp->setStatusMessage("OK");
+  //     resp->setContentType("image/png");
+  //     resp->setBody(string(favicon, sizeof favicon));
+  //   } else if (req.path() == "/hello") {
+  //     resp->setStatusCode(HttpResponse::k200Ok);
+  //     resp->setStatusMessage("OK");
+  //     resp->setContentType("text/plain");
+  //     resp->addHeader("Server", "Muduo");
+  //     resp->setBody("hello, world!\n");
+  //   } else {
+  //     resp->setStatusCode(HttpResponse::k404NotFound);
+  //     resp->setStatusMessage("Not Found");
+  //     resp->setCloseConnection(true);
+  //   }
 }
 int main() {
   Logger::setLogLevel(Logger::TRACE);
   TA::EventLoop loop;
-  TA::HttpServer httpserver(&loop, InetAddress(8080), string("test"));
+  TA::HttpServer httpserver(&loop, InetAddress(80), string("test"));
   httpserver.setHttpCallback(onRequest);
   httpserver.start();
   loop.loop();

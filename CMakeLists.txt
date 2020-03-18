@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.8.7)
 project (TAlib)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/library)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(SOURCES_DIRECTORY ${PROJECT_SOURCE_DIR}/src)

@@ -6,7 +6,7 @@
 .vscode/
 build/
 out/
-www/
+# www/
 WebServer
 log.txt
 library/

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>基于Amaze UI仿微信电脑版聊天样式 - 站长素材</title>
+	<link rel="stylesheet" href="css/amazeui.min.css" />
+	<link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+	<div id="app" class="box">
+		<div class="wechat">
+			<div class="sidestrip">
+				<div class="am-dropdown" data-am-dropdown>
+					<!--头像插件-->
+					<div class="own_head am-dropdown-toggle"></div>
+					<div class="am-dropdown-content">
+						<div class="own_head_top">
+							<div class="own_head_top_text">
+								<p class="own_name">彭于晏丶plus<img src="images/icon/head.png" alt="" /></p>
+								<p class="own_numb">微信号：123456</p>
+							</div>
+							<img src="images/own_head.jpg" alt="" />
+						</div>
+						<div class="own_head_bottom">
+							<p><span>地区</span>江西 九江</p>
+							<div class="own_head_bottom_img">
+								<a href=""><img src="images/icon/head_1.png" /></a>
+								<a href=""><img src="images/icon/head_2.png" /></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--三图标-->
+				<div class="sidestrip_icon">
+					<a id="si_1" style="background: url(images/icon/head_2_1.png) no-repeat;"></a>
+					<a id="si_2"></a>
+					<a id="si_3"></a>
+				</div>
+
+				<!--底部扩展键-->
+				<div id="doc-dropdown-justify-js">
+					<div class="am-dropdown" id="doc-dropdown-js" style="position: initial;">
+						<div class="sidestrip_bc am-dropdown-toggle"></div>
+						<ul class="am-dropdown-content" style="">
+							<li>
+								<a href="#"
+									data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, width: 400, height: 225}">意见反馈</a>
+								<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-1">
+									<div class="am-modal-dialog">
+										<div class="am-modal-hd">Modal 标题
+											<a href="javascript: void(0)" class="am-close am-close-spin"
+												data-am-modal-close>&times;</a>
+										</div>
+										<div class="am-modal-bd">
+											Modal 内容。本 Modal 无法通过遮罩层关闭。
+										</div>
+									</div>
+								</div>
+							</li>
+
+							<li><a href="#">备份与恢复</a></li>
+							<li><a href="#">设置</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<!--聊天列表-->
+			<div class="middle on">
+				<div class="wx_search">
+					<input type="text" placeholder="搜索" />
+					<button>+</button>
+				</div>
+				<div class="office_text">
+					<ul class="user_list">
+						<!-- <li :class=' item.sender==myid ?"me":"other"'><img
+								:src="  item.sender==myid  ?senderurl:receiverurl" title="接收方">
+							<span></span>
+						</li>
+						<li>
+							<div class="user_head"><img src="images/head/2.jpg" /></div>
+							<div class="user_text">
+								<p class="user_name">夏继涛</p>
+								<p class="user_message">[小程序]</p>
+							</div>
+							<div class="user_time">上午 11：03</div>
+						</li> -->
+						<li v-for="item in chatList" @click="clickChat(item.id)" :toid="item.id" class="user_active">
+							<div class="user_head"><img :src="item.ico_url" /></div>
+							<div class="user_text">
+								<p class="user_name">{{item.neckname}}({{item.id}})</p>
+								<p class="user_message">{{item.last_info}}</p>
+							</div>
+							<div class="user_time">{{item.last_time}}</div>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+
+			<!--好友列表-->
+			<div class="middle">
+				<div class="wx_search">
+					<input type="text" placeholder="搜索" />
+					<button>+</button>
+				</div>
+				<div class="office_text">
+					<ul class="friends_list">
+						<li>
+							<p>新的朋友</p>
+							<div class="friends_box">
+								<div class="user_head"><img src="images/head/1.jpg" /></div>
+								<div class="friends_text">
+									<p class="user_name">新的朋友</p>
+								</div>
+							</div>
+						</li>
+						<li>
+							<p>公众号</p>
+							<div class="friends_box">
+								<div class="user_head"><img src="images/head/2.jpg" /></div>
+								<div class="friends_text">
+									<p class="user_name">公众号</p>
+								</div>
+							</div>
+						</li>
+						<li>
+							<p>好友</p>
+							<div v-for="item in friendList" :toid="item.id" class="friends_box">
+								<div class="user_head"><img :src="item.ico_url" /></div>
+								<div class="friends_text">
+									<p class="user_name">{{item.neckname}}({{item.id}})</p>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<!--程序列表-->
+			<div class="middle">
+				<div class="wx_search">
+					<input type="text" placeholder="搜索收藏内容" />
+					<button>+</button>
+				</div>
+				<div class="office_text">
+					<ul class="icon_list">
+						<li class="icon_active">
+							<div class="icon"><img src="images/icon/icon.png" alt="" /></div>
+							<span>全部收藏</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon1.png" alt="" /></div>
+							<span>链接</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon2.png" alt="" /></div>
+							<span>相册</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon3.png" alt="" /></div>
+							<span>笔记</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon4.png" alt="" /></div>
+							<span>文件</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon5.png" alt="" /></div>
+							<span>音乐</span>
+						</li>
+						<li>
+							<div class="icon"><img src="images/icon/icon6.png" alt="" /></div>
+							<span>标签</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- 侧边栏内容 -->
+			<div id="doc-oc-demo3" class="am-offcanvas">
+				<div class="am-offcanvas-bar am-offcanvas-bar-flip">
+					<div class="am-offcanvas-content">
+						<p><a href="http://music.163.com/#/song?id=385554" target="_blank">网易音乐</a></p>
+					</div>
+				</div>
+			</div>
+			<!--聊天窗口-->
+			<div class="talk_window">
+				<!-- 聊天顶部 -->
+				<div class="windows_top">
+					<div class="windows_top_box">
+						<span>{{to_info.neckname}}({{to_info.id}})</span>
+						<ul class="window_icon">
+							<li><a href=""><img src="images/icon/icon7.png" /></a></li>
+							<li><a href=""><img src="images/icon/icon8.png" /></a></li>
+							<li><a href=""><img src="images/icon/icon9.png" /></a></li>
+							<li><a href=""><img src="images/icon/icon10.png" /></a></li>
+						</ul>
+						<div class="extend" class="am-btn am-btn-success" data-am-offcanvas="{target: '#doc-oc-demo3'}">
+						</div>
+
+					</div>
+				</div>
+
+				<!--聊天内容-->
+				<div class="windows_body">
+					<div class="office_text" style="height: 100%;">
+						<ul class="content" id="chatbox">
+							<li v-for="(item,index) in chatContentList"
+								:class=' item.sender== my_info.id ?"me":"other" '>
+								<img :src="  item.sender==my_info.id ? my_info.ico_url : to_info.ico_url " title=" 接收方">
+								<span>{{item.message.content}}</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- 聊天底部 -->
+				<div class="windows_input" id="talkbox">
+					<div class="input_icon">
+						<a href="javascript:;"></a>
+						<a href="javascript:;"></a>
+						<a href="javascript:;"></a>
+						<a href="javascript:;"></a>
+						<a onclick="videocall()"></a>
+						<a onclick="voicecall()"></a>
+					</div>
+					<div class="input_box">
+						<textarea name="" rows="" cols="" id="input_box" v-model="text"></textarea>
+						<button id="send">发送（S）</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- 登录窗口 -->
+			<div id="container" v-show="login_show">
+				<div id="output">
+					<div class="containerT">
+						<h1>用户登录</h1>
+						<div class="loginForm">
+							<input v-model="logform.form1" type="text">
+							<input v-model="logform.form2" type="text">
+							<button class="login_but" @click="login">登录</button>
+							<div id="prompt" class="prompt" style="color:white" onclick="jumpToZHUCE()">前往注册</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--语音窗口 -->
+	<div id="floatbox">
+		<div v-if="show" id="voicepanal"
+			style="width:280px;height:500px;margin:0px;overflow: hidden;position:relative;">
+			<h3 style="top:0ps;left:0px;z-index: 999;position: absolute;">{{title}}</h3>
+			<!-- <span class="lgtime">{{time}}</span> -->
+
+			<div id="hangup" onclick="voiceclose()"></div>
+
+		</div>
+	</div>
+	<!-- 视频窗口 -->
+	<div id="floatboxb">
+		<div v-if="show" id="videopanal"
+			style="width:280px;height:500px;margin:0px;overflow: hidden;position:relative;">
+			<h3 style="top:0ps;left:0px;z-index: 999;position: absolute;">{{title}}</h3>
+			<image style="z-index: 99;top:0ps;width:60%;height:60% ;position: absolute;" ondragstart="return false;"
+				:src="mycam"></image>
+			<image ondragstart="return false;" style=" top:0px;width:300%;height:300%; position: absolute;"
+				:src="opcam"></image>
+			<!-- <span class="lgtime"> {{time}}</span> -->
+
+			<div id="hangup" onclick="videoclose()"></div>
+		</div>
+	</div>
+
+	<!-- vue app部分 -->
+	<script src="/js/neko.js"></script>
+	<script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+	<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+	<script>
+		var chatapp = new Vue({
+			el: '#app',
+			data: {
+				/*登录界面*/
+				logform: {
+					form1: "root1",
+					form2: "root2",
+				},
+				// return {
+				/*通用数据*/
+				login_show: true,//是否显示登录页面
+				my_info: {
+					id: "testid",
+					neckname: "testneckname",
+					sex: "男",
+					age: 16,
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg"
+				},
+
+
+				/*好友列表数据*/
+				friendList: [{
+					id: "testtoid1",
+					neckname: "testtoneckname1",
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg",
+				}, {
+					id: "testtoid1",
+					neckname: "testtoneckname1",
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg",
+				}
+				],
+
+
+				/*聊天列表数据*/
+				chatList: [{
+					id: "testtoid1",
+					neckname: "testtoneckname1",
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg",
+					last_info: " 给👴整笑了",
+					last_time: "昨天"
+				}, {
+					id: "testtoid2",
+					neckname: "testtoneckname2",
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg",
+					last_info: "求两块钱交个话费",
+					last_time: "昨天"
+				}],
+
+
+				/*聊天界面数据*/
+				websock: null,
+				chatContentList: [{
+					'type': 'user',
+					'sender': "testid",
+					'receiver': "testtoid1",
+					'message': {
+						'type': 'text',
+						'content': 'text'
+					}
+				}, {
+					'type': 'user',
+					'sender': "testtoid1",
+					'receiver': "testid",
+					'message': {
+						'type': 'text',
+						'content': 'text'
+					}
+				}
+				],
+				to_info: {
+					id: "testtoid1",
+					neckname: "testtoneckname1",
+					ico_url: "https://randomuser.me/api/portraits/men/75.jpg",
+				},
+				text: "",//聊天打字窗口
+
+				// };
+			},
+			created: function () {
+			},
+			destroyed() {
+			},
+			methods: {
+				login: function () {
+					// `this` 指向 vm 实例
+					console.log('login_show is: ' + this.login_show);
+
+					// this.$http.post(
+					// 	'/try/ajax/demo_test_post.php',
+					// 	{
+					// 		name: "菜鸟教程",
+					// 		url: "http://www.runoob.com"
+					// 	},
+					// 	{ emulateJSON: true }
+					// ).then(function (res) {
+					// 	console.log(res.body);
+					// }, function (res) {
+					// 	console.log(res.status);
+					// });
+					this.my_info.id = this.logform.form1;
+					this.to_info.id = this.logform.form2;
+					voicecol = new Voice_connecter(chatapp._data.my_info.id)
+					videocol = new Video_connecter(chatapp._data.my_info.id)
+					ws = new WebSocket(wurl)
+					ws.onopen = function () {
+						ws.send(JSON.stringify({
+							'type': 'sys',
+							'sender': chatapp._data.my_info.id,
+							'message': {
+								'type': 'login'
+							}
+						}))
+					}
+
+					ws.onmessage = function (e) {
+						var data = JSON.parse(e.data)
+						console.log("主通信线程收到一个数据:", data);
+						if (data.type == "sys" & data.message.type == "logok") {
+							console.log(chatapp._data.my_info.id, "登录成功");
+						} else if (data.type == 'user') {
+							if (data.message.type == "voicereq") {
+								if (confirm(data.sender + "向您打电话") == true) {
+									voicecol.login(chatapp._data.my_info.id)
+									voicecol.startwith(data.sender)
+								}
+							} else if (data.message.type == "text") {
+								chatapp.chatContentList.push(data)
+								var ele = document.getElementById('chatbox');
+								console.log(ele.style.top, ele.scrollHeight)
+
+								ele.style.top = -(ele.scrollHeight - 400);
+							}
+						}
+					}
+
+					console.log("假装已经登录");
+					alert("假装已经登录");
+					this.login_show = false;
+					console.log('login_show is: ' + this.login_show);
+				},
+				// clickChat: function (event) {
+				// 	console.log("在chatpage点击了:", id)
+				// 	var id = event.currentTarget.dataset.id;
+				// 	console.log("在chatpage点击了:", id)
+
+				// 	this.to_info.id = id
+				// 	var idata = null
+				// 	var _this = this;
+				// 	$.get(serverip + ":7998/api/getChatContent.php?id=" + id, function (data, status) {
+				// 		idata = JSON.parse(data)
+
+				// 		while (app.contentList.length > 0) {
+				// 			app.contentList.pop()
+				// 		}
+
+				// 		for (var i = 0; i < idata.length; i++) {
+				// 			var data = {
+				// 				type: "user",
+				// 				sender: idata[i]["userID"],
+				// 				receiver: idata[i]["friendID"],
+				// 				message: {
+				// 					type: "text",
+				// 					time: idata[i]["time"],
+				// 					content: idata[i]["data"]
+				// 				}
+				// 			}
+				// 			app.contentList.push(data)
+				// 			console.log("获取聊天内容:", id, idata, data);
+				// 		}
+				// 		setTimeout(() => {
+				// 			var ele = document.getElementById('chatbox');
+				// 			console.log(ele.style.top, ele.scrollHeight)
+				// 			ele.style.top = -(ele.scrollHeight - 460);
+				// 		}, 460);
+				// 	});
+				// }
+			}
+		});
+		neko({ el: ".wechat" });
+	</script>
+
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+
+	<script src="./lg/neko.js"></script>
+
+	<script src="./lg/voice_tools.js"></script>
+	<script src="./lg/voice_connecter.js"></script>
+
+	<script src="./lg/video.js"></script>
+	<script src="./lg/video_connecter.js"></script>
+
+	<script src="./lg/ws_main.js"></script>
+	<style>
+		#hangup {
+			/* . */
+			width: 60px;
+			height: 60px;
+			background: #ddd;
+			z-index: 999;
+			position: absolute;
+			bottom: 10px;
+			margin-top: 400px;
+			margin-left: 110px;
+			box-sizing: border-box;
+			border: 0px solid #66cc66;
+			border-radius: 50%;
+			background: url(./lg/hangup.jpg) no-repeat center center;
+			background-size: 110% 110%;
+			overflow: hidden;
+			cursor: pointer
+		}
+
+		.lgtime {
+			background: #aaa;
+			z-index: 999;
+			position: absolute;
+			bottom: 30%;
+			left: 45%;
+			overflow: hidden;
+		}
+	</style>
+
+
+
+
+	<!-- 登录界面部分 -->
+	<link rel="stylesheet" type="text/css" href="css/login.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vector.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			Victor("container", "output");   //登陆背景函数
+		});
+	</script>
+
+
+
+
+
+
+	<!-- 界面原生部分 -->
+	<script type="text/javascript" src="js/amazeui.min.js"></script>
+	<script type="text/javascript" src="js/zUI.js"></script>
+	<script type="text/javascript" src="js/wechat.js"></script>
+	<script type="text/javascript">
+		//三图标
+		window.onload = function () {
+			function a() {
+				var si1 = document.getElementById('si_1');
+				var si2 = document.getElementById('si_2');
+				var si3 = document.getElementById('si_3');
+				si1.onclick = function () {
+					si1.style.background = "url(images/icon/head_2_1.png) no-repeat"
+					si2.style.background = "";
+					si3.style.background = "";
+				};
+				si2.onclick = function () {
+					si2.style.background = "url(images/icon/head_3_1.png) no-repeat"
+					si1.style.background = "";
+					si3.style.background = "";
+				};
+				si3.onclick = function () {
+					si3.style.background = "url(images/icon/head_4_1.png) no-repeat"
+					si1.style.background = "";
+					si2.style.background = "";
+				};
+			};
+			a();
+		};
+	</script>
+
+
+</body>
+
+</html>

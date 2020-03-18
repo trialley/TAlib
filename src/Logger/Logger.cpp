@@ -1,4 +1,5 @@
 #include <Logger/Logger.h>
+#include <Logger/TimeStamp.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
@@ -6,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
- #include <Logger/TimeStamp.h>
 
 __thread char t_time[64];
 __thread time_t t_lastSecond;
@@ -33,7 +33,15 @@ void Logger::setLogLevel(LogLevel level) {
 Logger::LogLevel Logger::logLevel() {
   return g_logLevel;
 }
-
+const char* LogLevelColor[Logger::NUM_LOG_LEVELS + 1] = {
+    purple,
+    blue,
+    green,
+    yellow,
+    red,
+    black,
+    normal,
+};
 const char* LogLevelName[Logger::NUM_LOG_LEVELS] =
     {
         "[TRACE]",

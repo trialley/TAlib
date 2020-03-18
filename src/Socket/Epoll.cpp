@@ -13,7 +13,7 @@ namespace EventFd {
 int createEpollFd() {
   int epfd = epoll_create1(EPOLL_CLOEXEC);
   if (epfd < 0) {
-    LOG_SYSFATAL << "createEpollFd() Failed.";
+    LOG_FATAL << "createEpollFd() Failed.";
   }
 
   return epfd;
@@ -22,21 +22,21 @@ int createEpollFd() {
 void epollRegister(int epfd, int fd, struct epoll_event* ev) {
   int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, ev);
   if (ret < 0) {
-    LOG_SYSFATAL << "epollRegister() Failed.";
+    LOG_FATAL << "epollRegister() Failed.";
   }
 }
 
 void epollUpdate(int epfd, int fd, struct epoll_event* ev) {
   int ret = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, ev);
   if (ret < 0) {
-    LOG_SYSFATAL << "epollUpdate() Failed.";
+    LOG_FATAL << "epollUpdate() Failed.";
   }
 }
 
 void epollDelete(int epfd, int fd, struct epoll_event* ev) {
   int ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, ev);
   if (ret < 0) {
-    LOG_SYSFATAL << "epollDelete() Failed.";
+    LOG_FATAL << "epollDelete() Failed.";
   }
 }
 
@@ -66,7 +66,7 @@ TimeStamp Epoll::poll(int timeoutMs, ChannelList* activeChannels) {
   } else if (numEvents == 0) {
     LOG_TRACE << " nothing happended";
   } else {
-    LOG_SYSERR << "Epoll::epoll_wait()";
+    LOG_ERROR << "Epoll::epoll_wait()";
   }
 
   return now;

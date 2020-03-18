@@ -60,7 +60,7 @@ void Acceptor::handleRead()
   }
   else
   {
-    LOG_SYSERR << "in Acceptor::handleRead";
+    LOG_ERROR << "in Acceptor::handleRead";
     if(errno == EMFILE)
     {
       ::close(m_idleFd);

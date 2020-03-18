@@ -2,11 +2,21 @@
 #include <Logger/TimeStamp.h>
 #include <assert.h>
 #include <errno.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
+#include <iostream>
+#include <sstream>
+#include <thread>
+
+#include <unistd.h>
+#define gettid() syscall(__NR_gettid)
 
 __thread char t_time[64];
 __thread time_t t_lastSecond;
@@ -19,7 +29,23 @@ static const char yellow[] = {0x1b, '[', '1', ';', '3', '3', 'm', 0};
 static const char blue[] = {0x1b, '[', '1', ';', '3', '4', 'm', 0};
 static const char purple[] = {0x1b, '[', '1', ';', '3', '5', 'm', 0};
 static const char normal[] = {0x1b, '[', '0', ';', '3', '9', 'm', 0};
-
+const char* LogLevelColor[Logger::NUM_LOG_LEVELS + 1] = {
+    purple,
+    blue,
+    green,
+    yellow,
+    red,
+    black,
+    normal,
+};
+const char* LogLevelName[Logger::NUM_LOG_LEVELS] = {
+    "[TRACE]",
+    "[DEBUG]",
+    "[INFO ]",
+    "[WARN ]",
+    "[ERROR]",
+    "[FATAL]",
+};
 const char* strerror_tl(int savedErrno) {
   return strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
 }
@@ -30,40 +56,22 @@ void Logger::setLogLevel(LogLevel level) {
   g_logLevel = level;
 }
 
-Logger::LogLevel Logger::logLevel() {
+Logger::LogLevel Logger::getLogLevel() {
   return g_logLevel;
 }
-const char* LogLevelColor[Logger::NUM_LOG_LEVELS + 1] = {
-    purple,
-    blue,
-    green,
-    yellow,
-    red,
-    black,
-    normal,
-};
-const char* LogLevelName[Logger::NUM_LOG_LEVELS] =
-    {
-        "[TRACE]",
-        "[DEBUG]",
-        "[INFO ]",
-        "[WARN ]",
-        "[ERROR]",
-        "[FATAL]",
-};
 
 // helper class for known string length at compile time
-class T {
- public:
-  T(const char* str, unsigned len)
-      : m_str(str),
-        m_len(len) {
-    assert(strlen(str) == m_len);
-  }
+// class T {
+//  public:
+//   T(const char* str, unsigned len)
+//       : m_str(str),
+//         m_len(len) {
+//     assert(strlen(str) == m_len);
+//   }
 
-  const char* m_str;
-  const unsigned m_len;
-};
+//   const char* m_str;
+//   const unsigned m_len;
+// };
 
 void defaultOutput(const char* msg, int len) {
   size_t n = fwrite(msg, 1, len, stdout);
@@ -84,79 +92,28 @@ void Logger::setOutput(outputFunc out) {
 void Logger::setFlush(flushFunc flush) {
   g_flush = flush;
 }
-
-Logger::Logger(SourceFile file, int line)
-    : m_impl(INFO, 0, file, line) {
-}
-
-Logger::Logger(SourceFile file, int line, LogLevel level)
-    : m_impl(level, 0, file, line) {
-}
-
-Logger::Logger(SourceFile file, int line, bool toAbort)
-    : m_impl(toAbort ? FATAL : ERROR, errno, file, line) {
-}
-
-Logger::Logger(SourceFile file, int line, LogLevel level, const char* func)
-    : m_impl(level, 0, file, line) {
-  m_impl.m_stream << '[' << func << "] ";
+#ifdef _WIN32
+#define filenamecut(x) (strrchr(x, '\\') ? strrchr(x, '\\') + 1 : x)
+#elif __linux
+#define filenamecut(x) (strrchr(x, '/') ? strrchr(x, '/') + 1 : x)
+#endif
+Logger::Logger(const char* filename, int line, LogLevel level, const char* func)
+    : _time(TimeStamp::now()) {
+  _formatTime();  //打印时间
+  /*打印 [带颜色的等级] [文件:行-函数]  TODO:打印线程协程号*/
+  _stream << LogLevelColor[level] << LogLevelName[level] << LogLevelColor[6] << ' '
+          << " [pid:" << getpid() << "] [tid:" << gettid() << "] " << '[' << filenamecut(filename) << ':' << line << "] [" << func << "] "
+          << LogLevelColor[level] << "|" << LogLevelColor[6];
 }
 
 Logger::~Logger() {
-  m_impl.finish();
+  _stream << "\n";
   const LogStream::Buffer& buf(stream().buffer());
   g_output(buf.data(), buf.length());
-  if (m_impl.m_level == FATAL) {
-    g_flush();
-    abort();
-  }
 }
 
-Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile& file, int line)
-    : m_time(TimeStamp::now()),
-      m_stream(),
-      m_level(level),
-      m_line(line),
-      m_fileBaseName(file) {
-  formatTime();
-
-  switch (level) {
-    case TRACE:
-      m_stream << green << LogLevelName[level] << normal << ' ';
-      break;
-    case DEBUG:
-      m_stream << blue << LogLevelName[level] << normal << ' ';
-      break;
-    case INFO:
-      m_stream << black << LogLevelName[level] << normal << ' ';
-      break;
-    case WARN:
-      m_stream << yellow << LogLevelName[level] << normal << ' ';
-      break;
-    case ERROR:
-      m_stream << purple << LogLevelName[level] << normal << ' ';
-      break;
-    case FATAL:
-      m_stream << red << LogLevelName[level] << normal << ' ';
-      break;
-    default:
-      m_stream << LogLevelName[level] << ' ';
-      break;
-  }
-
-  //m_stream << LogLevelName[level] << ' ';
-  m_stream << '[' << m_fileBaseName.m_data << ':' << m_line << "] ";
-  if (savedErrno != 0) {
-    m_stream << strerror_tl(savedErrno) << " (errno=" << savedErrno << ") ";
-  }
-}
-
-void Logger::Impl::finish() {
-  m_stream << '\n';
-}
-
-void Logger::Impl::formatTime() {
-  int64_t microSecondsSinceEpoch = m_time.microSecondsSinceEpoch();
+void Logger::_formatTime() {
+  int64_t microSecondsSinceEpoch = _time.microSecondsSinceEpoch();
   time_t seconds = static_cast<time_t>(microSecondsSinceEpoch / TimeStamp::kMicroSecondsPerSecond);
   int microseconds = static_cast<int>(microSecondsSinceEpoch % TimeStamp::kMicroSecondsPerSecond);
   if (seconds != t_lastSecond) {
@@ -174,5 +131,5 @@ void Logger::Impl::formatTime() {
 
   Fmt us(".%06d ", microseconds);
   assert(us.length() == 8);
-  m_stream << t_time << us.data();
+  _stream << t_time << us.data();
 }

@@ -111,7 +111,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len) {
       nwrote = 0;
       if (errno != EWOULDBLOCK)  // EAGIN
       {
-        LOG_SYSERR << "TcpConnection::sendInLoop()";
+        LOG_ERROR << "TcpConnection::sendInLoop()";
         if (errno == EPIPE || errno == ECONNRESET) {
           faultError = true;
         }
@@ -160,7 +160,7 @@ void TcpConnection::handleRead() {
     handleClose();
   } else {
     errno = savedErrno;
-    LOG_SYSERR << "TcpConnection::handleRead()";
+    LOG_ERROR << "TcpConnection::handleRead()";
     handleError();
   }
 }
@@ -182,7 +182,7 @@ void TcpConnection::handleWrite() {
         {
         }
       } else {
-        LOG_SYSERR << "TcpConnection::handleWrite";
+        LOG_ERROR << "TcpConnection::handleWrite";
       }
     }
   } else {

@@ -33,7 +33,7 @@ TimeStamp Poll::poll(int timeoutMs, ChannelList* activeChannels)
     LOG_TRACE << " nothing happended";
   }
   else{
-    LOG_SYSERR << "Poll::poll()";
+    LOG_ERROR << "Poll::poll()";
   }
 
   return now;

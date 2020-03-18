@@ -42,7 +42,7 @@ void sockets::fromIpPort(const char* ip, uint16_t port,
   addr->sin_port = hostToNetwork16(port);
   if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
   {
-    LOG_SYSERR << "sockets::fromIpPort";
+    LOG_ERROR << "sockets::fromIpPort";
   }
 }
 
@@ -65,7 +65,7 @@ void sockets::close(int sockfd)
 {
   if (::close(sockfd) < 0)
   {
-    LOG_SYSERR << "sockets::close";
+    LOG_ERROR << "sockets::close";
   }
 }
 
@@ -73,7 +73,7 @@ void sockets::shutdownWrite(int sockfd)
 {
   if(::shutdown(sockfd, SHUT_WR) < 0)
   {
-    LOG_SYSERR << "sockets::shutdownWrite";
+    LOG_ERROR << "sockets::shutdownWrite";
   }
 }
 
@@ -90,7 +90,7 @@ int sockets::createNonblockingOrDie(sa_family_t family)
   int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
   if (sockfd < 0)
   {
-    LOG_SYSFATAL << "sockets::createNonblockingOrDie";
+    LOG_FATAL << "sockets::createNonblockingOrDie";
   }
 
   return sockfd;
@@ -101,7 +101,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)
   int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr)));
   if(ret < 0)
   {
-    LOG_SYSFATAL << "sockets::bindOrDie";
+    LOG_FATAL << "sockets::bindOrDie";
   }
 }
 
@@ -110,7 +110,7 @@ void sockets::listenOrDie(int sockfd)
   int ret = ::listen(sockfd, SOMAXCONN);
   if(ret < 0)
   {
-    LOG_SYSFATAL << "sockets::listenOrDie";
+    LOG_FATAL << "sockets::listenOrDie";
   }
 }
 
@@ -127,7 +127,7 @@ int sockets::accept(int sockfd, struct sockaddr_in6* addr)
   if (connfd < 0)
   {
     int savedErrno = errno;
-    LOG_SYSERR << "Socket::accept";
+    LOG_ERROR << "Socket::accept";
     switch (savedErrno)
     {
       case EAGAIN:
@@ -193,7 +193,7 @@ struct sockaddr_in6 sockets::getLocalAddr(int sockfd)
   socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
   if(::getsockname(sockfd, reinterpret_cast<struct sockaddr*>(&localaddr), &addrlen) < 0)
   {
-    LOG_SYSERR << "sockets::getLocalAddr";
+    LOG_ERROR << "sockets::getLocalAddr";
   }
 
   return localaddr;
@@ -206,7 +206,7 @@ struct sockaddr_in6 sockets::getPeerAddr(int sockfd)
   socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
   if (::getpeername(sockfd, reinterpret_cast<struct sockaddr*>(&peeraddr), &addrlen) < 0)
   {
-    LOG_SYSERR << "sockets::getPeerAddr";
+    LOG_ERROR << "sockets::getPeerAddr";
   }
   return peeraddr;
 }

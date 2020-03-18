@@ -22,7 +22,7 @@ int createEventfd() {
   LOG_TRACE << "createEventfd() fd : " << evtfd;
 
   if (evtfd < 0) {
-    LOG_SYSERR << "Failed in eventfd";
+    LOG_ERROR << "Failed in eventfd";
     abort();
   }
 

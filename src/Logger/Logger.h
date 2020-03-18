@@ -41,7 +41,7 @@ class Logger {
 
   static void setLogLevel(LogLevel level);
   static LogLevel getLogLevel();
-  static void setAsync (bool);
+  static void setAsync(const std::string filePath, off_t rollSize = 10000, double flushInterval = 3.0);
   LogStream& stream() { return _stream; }
 
   typedef void (*outputFunc)(const char* msg, int len);

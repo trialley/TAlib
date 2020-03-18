@@ -5,51 +5,57 @@
 #include <mutex>
 #include <string>
 
-#include <Logger/Thread.h>
-#include "LogStream.h"
-#include <Logger/ptr_vector.h>
 #include <Logger/Condition.h>
+#include <Logger/Thread.h>
+#include <Logger/ptr_vector.h>
+#include "LogStream.h"
 
-class AsyncLogging
-{
-public:
-	AsyncLogging(const std::string filePath, off_t rollSize, double flushInterval = 3.0);
-	~AsyncLogging();
+class AsyncLogging {
+ public:
+  ~AsyncLogging();
+  static AsyncLogging* getInstance();
+  void start() {
+    if (!m_isRunning) {
+      m_isRunning = true;
+      m_thread.start();
+    }
+  }
+  void set(const std::string filePath, off_t rollSize, double flushInterval) {
+    m_filePath = filePath;
+    m_rollSize = rollSize;
+    m_flushInterval = flushInterval;
+  }
+  void stop() {
+    m_isRunning = false;
+    m_cond.notify();
+    m_thread.join();
+  }
 
-	void start(){
-		m_isRunning = true;
-		m_thread.start();
-	}
+  void append(const char* logline, std::size_t len);
 
-	void stop(){
-		m_isRunning = false;
-		m_cond.notify();
-		m_thread.join();
-	}
+ private:
+  AsyncLogging();
+  AsyncLogging(const AsyncLogging&);
+  AsyncLogging& operator=(const AsyncLogging&);
 
-	void append(const char *logline, std::size_t len);
+  void threadRoutine();
 
-private:
-	AsyncLogging(const AsyncLogging&);
-	AsyncLogging& operator=(const AsyncLogging&);
+  typedef LogBuffer<kLargeBuffer> Buffer;
+  typedef myself::ptr_vector<Buffer> BufferVector;
+  typedef std::unique_ptr<Buffer> BufferPtr;
 
-	void threadRoutine();
+  std::string m_filePath;
+  off_t m_rollSize;
+  double m_flushInterval;
 
-	typedef LogBuffer<kLargeBuffer> Buffer;
-	typedef myself::ptr_vector<Buffer> BufferVector;
-	typedef std::unique_ptr<Buffer> BufferPtr;
+  bool m_isRunning;
+  Thread m_thread;
+  std::mutex m_mutex;
+  Condition m_cond;
 
-	std::string m_filePath;
-	off_t m_rollSize;
-	const double m_flushInterval;
-	bool m_isRunning;
-	Thread m_thread;
-	std::mutex m_mutex;
-	Condition m_cond;
-
-	BufferPtr m_currentBuffer;
-	BufferPtr m_nextBuffer;
-	BufferVector m_buffers;
+  BufferPtr m_currentBuffer;
+  BufferPtr m_nextBuffer;
+  BufferVector m_buffers;
 };
 
 #endif

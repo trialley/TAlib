@@ -1,6 +1,8 @@
+#include <Logger/AsyncLogging.h>
 #include <Logger/Logger.h>
-#include <common/TimeStamp.h>
 #include <assert.h>
+
+#include <common/TimeStamp.h>
 #include <errno.h>
 #include <pthread.h>
 #include <stdint.h>
@@ -14,8 +16,6 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
-
-#include <unistd.h>
 #define gettid() syscall(__NR_gettid)
 
 __thread char t_time[64];
@@ -81,24 +81,22 @@ void defaultOutput(const char* msg, int len) {
 void defaultFlush() {
   fflush(stdout);
 }
-void asyncOutput (const char* msg, int len) {
-    size_t n = fwrite (msg, 1, len, stdout);
-    (void)n;
+void asyncOutput(const char* msg, int len) {
+  AsyncLogging::getInstance()->append(msg, len);
 }
 
-void asyncFlush () {
-    fflush (stdout);
+void asyncFlush() {
+  fflush(stdout);
 }
 Logger::outputFunc g_output = defaultOutput;
 Logger::flushFunc g_flush = defaultFlush;
-void Logger::setAsync (bool isas) {
-    if (isas) {
-        Logger::setOutput (asyncOutput);
-        Logger::setFlush (asyncFlush);
-    } else {
-        Logger::setOutput (defaultOutput);
-        Logger::setFlush (defaultFlush);
-    }
+void Logger::setAsync(const std::string filePath, off_t rollSize, double flushInterval) {
+  AsyncLogging* temp = AsyncLogging::getInstance();
+  temp->set(filePath, rollSize, flushInterval);
+  temp->start();
+
+  Logger::setOutput(asyncOutput);
+  Logger::setFlush(asyncFlush);
 }
 void Logger::setOutput(outputFunc out) {
   g_output = out;

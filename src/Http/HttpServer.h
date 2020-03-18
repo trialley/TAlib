@@ -3,10 +3,10 @@
 #include <Http/HttpRequest.h>
 #include <Http/HttpResponse.h>
 #include <Reactor/Reactor.h>
-#include<common/TimeStamp.h>
-#include<common/noncopyable.h>
-#include<string>
-
+#include <Tcp/TcpServer.h>
+#include <common/TimeStamp.h>
+#include <common/noncopyable.h>
+#include <string>
 namespace TA {
 /// A simple embeddable HTTP server designed for report status of a program.
 /// It is not a fully HTTP 1.1 compliant server, but provides minimum features
@@ -39,7 +39,7 @@ class HttpServer : noncopyable {
   void onConnection(const TcpConnectionPtr& conn);
   void onMessage(const TcpConnectionPtr& conn,
                  Buffer* buf,
-      TimeStamp receiveTime);
+                 TimeStamp receiveTime);
   void onRequest(const TcpConnectionPtr&, const HttpRequest&);
 
   TcpServer server_;

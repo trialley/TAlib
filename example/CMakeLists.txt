@@ -34,7 +34,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -O3")
 
 
-
+add_executable(static_server_example  ${SOURCES_DIRECTORY}/static_server_example.cpp)
+target_link_libraries(static_server_example TAlib
+                                     pthread)
 
 add_executable(tcp_server_example  ${SOURCES_DIRECTORY}/tcp_server_example.cpp)
 target_link_libraries(tcp_server_example TAlib

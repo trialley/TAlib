@@ -31,7 +31,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 ###
 # compilation options
 ###
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra")
 
 
 add_executable(static_server_example  ${SOURCES_DIRECTORY}/static_server_example.cpp)
@@ -55,6 +55,6 @@ target_link_libraries(http_server_example
 
 add_executable(mysql_pool_example ${SOURCES_DIRECTORY}/mysql_pool_example.cpp)
 target_link_libraries(mysql_pool_example    
-								            TAlib
+								            TAlib mysqlclient 
                                             pthread
                                            )

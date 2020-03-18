@@ -1,6 +1,6 @@
+#include <MySQL/pool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "pool.h"
 using std::cout;
 using std::endl;
 
@@ -32,13 +32,13 @@ void* handler(void* arg) {
   }
 }
 
-int main(int argc, char* argv[]) {
+int main() {
   string host = "127.0.0.1";
   string user = "root";
   string pass = "haosql";
   string dbname = "test";
   int poolSize = 20;
-  const int THREAD_COUNT = 50;
+  const int THREAD_COUNT = 500;
 
   Pool::initPool(host, user, pass, dbname, poolSize);
 

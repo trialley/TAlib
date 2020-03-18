@@ -38,7 +38,7 @@ foreach(dir ${TALIB__DIRECTORY})
   set(talib_sources ${s_${dir}} ${h_${dir}})
 endforeach()
 add_library(TAlib ${talib_sources})
-target_link_libraries(TAlib pthread tcmalloc)
+target_link_libraries(TAlib pthread mysqlclient  tcmalloc )
 # ≤‚ ‘≥Ã–Ú≤ø∑÷
 
 add_subdirectory(${EXAMPLE_DIRECTORY}/)

@@ -49,7 +49,7 @@ void Pool::unlockl() {
   pthread_mutex_unlock(&logmutex);
 }
 
-Pool::Pool(string host, string user, string pass, string dbname, int poolSize) {
+Pool::Pool() {
   vec = new some[Pool::poolSize_];
 
   for (int i = 0; i < poolSize_; i++) {
@@ -99,7 +99,7 @@ Connection* Pool::getConnection() {
 
     //mysql_library_init(0,NULL,NULL);
 
-    pool_ = new Pool(host_, user_, pass_, dbname_, poolSize_);
+    pool_ = new Pool();
   }
   Pool::unlocki();
 

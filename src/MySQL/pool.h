@@ -57,7 +57,7 @@ class Pool {
   static int poolSize_;
 
  public:
-  Pool(string host, string user, string pass, string dbname, int poolSize);
+  Pool();
   virtual ~Pool();
 };
 

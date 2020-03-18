@@ -45,11 +45,16 @@ target_link_libraries(tcp_server_example TAlib
 add_executable(AsyncLogging_example  ${SOURCES_DIRECTORY}/AsyncLogging_example.cpp)
 target_link_libraries(AsyncLogging_example    TAlib
                                             pthread
-                                           )
-
-
+										   )
+										   
 add_executable(http_server_example ${SOURCES_DIRECTORY}/http_server_example.cpp)
 target_link_libraries(http_server_example    
+											TAlib
+											pthread
+											)
+
+add_executable(mysql_pool_example ${SOURCES_DIRECTORY}/mysql_pool_example.cpp)
+target_link_libraries(mysql_pool_example    
 								            TAlib
                                             pthread
                                            )

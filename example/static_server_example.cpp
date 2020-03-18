@@ -20,81 +20,83 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-
+#include<Redis/RedisConnect.h>
 using namespace std;
 
 extern char favicon[555];
 // std::map<string, TA::HttpServer::HttpCallback> router;
 
-void onRequest(const HttpRequest& req, HttpResponse* resp) {
-  LOG_INFO << "Headers " << req.methodString() << " " << req.path();
-  if (1) {
-    const std::map<string, string>& headers = req.headers();
-    for (const auto& header : headers) {
-      LOG_INFO << header.first << ": " << header.second;
+void staticRequest (const HttpRequest& req, HttpResponse* resp) {
+    LOG_INFO << "Headers " << req.methodString () << " " << req.path ();
+    if (1) {
+        const std::map<string, string>& headers = req.headers ();
+        for (const auto& header : headers) {
+            LOG_INFO << header.first << ": " << header.second;
+        }
     }
-  }
-  string filepath = string("../www") + req.path ().c_str ();
-  LOG_INFO << filepath;
-  //   if (!(getCache().get(path, outbuffer))) {
-  int src_fd = open(filepath.c_str(), 0, 0);
-  struct stat sbuf;
-  if (stat(filepath.c_str(), &sbuf) == 0) {
-    int size = sbuf.st_size;
-    char* src_addr = (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, src_fd, 0);
-    string context(src_addr, size);
-    int dot_pos = req.path().rfind('.');
-    string now = TimeStamp::now().toFormattedString(true);
 
-    resp->setStatusCode(HttpResponse::k200Ok);
-    resp->setStatusMessage("OK");
-    resp->setContentType(
-        Mimetype::getMime(req.path().substr(dot_pos)));
-    resp->addHeader("Server", "Muduo");
-    resp->setBody(context);
-    munmap(src_addr, size);
-    close(src_fd);
-  }
-  //   }
 
-  //   if (router.find(req.path()) != router.end()) {
-  //     router[req.path()](req, resp);
-  //   }
-  //   if (req.path() == "/") {
-  //     resp->setStatusCode(HttpResponse::k200Ok);
-  //     resp->setStatusMessage("OK");
-  //     resp->setContentType("text/html");
-  //     resp->addHeader("Server", "Muduo");
-  //     string now = TimeStamp::now().toFormattedString(true);
-  //     resp->setBody(
-  //         "<html><head><title>This is title</title></head>"
-  //         "<body><h1>Hello</h1>Now is UTC " +
-  //         now +
-  //         "</body></html>");
-  //   } else if (req.path() == "/favicon.ico") {
-  //     resp->setStatusCode(HttpResponse::k200Ok);
-  //     resp->setStatusMessage("OK");
-  //     resp->setContentType("image/png");
-  //     resp->setBody(string(favicon, sizeof favicon));
-  //   } else if (req.path() == "/hello") {
-  //     resp->setStatusCode(HttpResponse::k200Ok);
-  //     resp->setStatusMessage("OK");
-  //     resp->setContentType("text/plain");
-  //     resp->addHeader("Server", "Muduo");
-  //     resp->setBody("hello, world!\n");
-  //   } else {
-  //     resp->setStatusCode(HttpResponse::k404NotFound);
-  //     resp->setStatusMessage("Not Found");
-  //     resp->setCloseConnection(true);
-  //   }
+
+
+
+    string filepath = string ("../www") + req.path ().c_str ();
+    string path = req.path ().c_str ();
+    LOG_INFO << filepath;
+    //   if (!(getCache().get(path, outbuffer))) {
+    int src_fd = open (filepath.c_str (), 0, 0);
+    struct stat sbuf;
+    if (stat (filepath.c_str (), &sbuf) == 0) {
+        int size = sbuf.st_size;
+        char* src_addr = (char*)mmap (NULL, size, PROT_READ, MAP_PRIVATE, src_fd, 0);
+        string context (src_addr, size);
+        int dot_pos = req.path ().rfind ('.');
+        string now = TimeStamp::now ().toFormattedString (true);
+        munmap (src_addr, size);
+        close (src_fd);
+
+
+        resp->setStatusCode (HttpResponse::k200Ok);
+        resp->setStatusMessage ("OK");
+        resp->setContentType (Mimetype::getMime (req.path ().substr (dot_pos)));
+        resp->addHeader ("Server", "Muduo");
+        resp->setBody (context);
+
+    } else if (path == "/redis") {
+        string val;
+
+        //从连接池中获取一个连接
+        shared_ptr<RedisConnect> redis = RedisConnect::Instance ();
+        LOG_INFO << "get pool\n";
+
+        //设置一个键值
+        redis->set ("key", "val");
+        LOG_INFO << "set key\n";
+
+        //获取键值内容
+        redis->get ("key", val);
+
+        //执行expire命令设置超时时间
+        redis->execute ("expire", "key", 60);
+
+        //获取超时时间(与ttl(key)方法等价)
+        redis->execute ("ttl", "key");
+
+        //调用getStatus方法获取ttl命令执行结果
+        LOG_INFO<<"超时时间："<<redis->getStatus();
+
+        //执行del命令删除键值
+        redis->execute ("del", "key");
+    }
 }
-int main() {
-  Logger::setLogLevel(Logger::TRACE);
-  TA::EventLoop loop;
-  TA::HttpServer httpserver(&loop, InetAddress(80), string("test"));
-  httpserver.setHttpCallback(onRequest);
-  httpserver.start();
-  loop.loop();
+int main () {
+    RedisConnect::Setup ("127.0.0.1", 6379);
+
+    Logger::setLogLevel (Logger::TRACE);
+    TA::EventLoop loop;
+    TA::HttpServer httpserver (&loop, InetAddress (80), string ("test"));
+    httpserver.setHttpCallback (staticRequest);
+    httpserver.start ();
+    loop.loop ();
 }
 char favicon[555] = {
     '\x89',

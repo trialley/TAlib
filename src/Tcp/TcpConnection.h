@@ -23,8 +23,8 @@ public:
   ~TcpConnection();
 
   EventLoop* getLoop() const { return p_loop; }
-  const std::string& name() const { return m_name; }
-  void setConnectionName(const std::string& name) { m_name = name; }
+  const std::string& name() const { return _name; }
+  void setConnectionName(const std::string& name) { _name = name; }
   void setConnectionCallBack(const NetCallBacks::ConnectionCallBack& cb) { m_connectionCallBack = cb; }
   void setMessageCallBack(const NetCallBacks::MessageCallBack& cb) { m_messageCallBack = cb; }
   void setCloseCallBack(const NetCallBacks::CloseCallBack& cb) { m_closeCallBack = cb; }
@@ -63,7 +63,7 @@ private:
   void forceCloseInLoop();
 
   EventLoop* p_loop;
-  std::string m_name;
+  std::string _name;
   StateE m_state;
   std::unique_ptr<Socket> p_socket;
   std::unique_ptr<Channel> p_channel;

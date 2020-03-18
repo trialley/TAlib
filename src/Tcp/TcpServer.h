@@ -14,8 +14,6 @@ namespace TA {
 
 class EventLoop;
 
-extern std::unique_ptr<TA::EventLoopThreadPool> ex_event_loop_thread_pool;
-
 class TcpServer {
  public:
   TcpServer(EventLoop* loop, const InetAddress& listenAddr, const std::string& name = "Serv ");
@@ -26,11 +24,12 @@ class TcpServer {
   void setConnectionCallBack(const NetCallBacks::ConnectionCallBack& cb) { m_connectionCallBack = cb; }
   void setMessageCallBack(const NetCallBacks::MessageCallBack& cb) { m_messageCallBack = cb; }
   void setCloseCallBack(const NetCallBacks::CloseCallBack& cb) { m_closeCallBack = cb; }
+  void setThreadNum(int numThreads);
 
  private:
   TcpServer& operator=(const TcpServer&);
   TcpServer(const TcpServer&);
-  EventLoop* getLoop () const { return p_loop; }
+  EventLoop* getLoop() const { return p_loop; }
   void newConnetion(int sockfd, const InetAddress& peerAddr);
   void removeConnection(const TcpConnectionPtr& conn);
   void removeConnectionInLoop(const TcpConnectionPtr& conn);
@@ -39,7 +38,8 @@ class TcpServer {
   typedef std::set<TcpConnectionPtr> ConnectionsSet_t;
 
   EventLoop* p_loop;
-  std::string m_name;
+  std::string _name;
+  std::shared_ptr<EventLoopThreadPool> _threadPool;
   std::unique_ptr<Acceptor> p_acceptor;
   //ConnectionMap m_connectionsMap;
   ConnectionsSet_t m_connectionsSet;

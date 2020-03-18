@@ -4,10 +4,10 @@
 #include <sys/eventfd.h>
 #include <unistd.h>
 
-#include <Socket/Epoll.h>
-#include <Reactor/EventLoop.h>
 #include <Logger/Logger.h>
+#include <Reactor/EventLoop.h>
 #include <Reactor/Poller.h>
+#include <Socket/Epoll.h>
 #include <Socket/SocketHelp.h>
 
 using namespace TA;
@@ -71,7 +71,7 @@ void EventLoop::loop() {
 
     printActiveChannels();
 
-    for (ChannelList::iterator it = m_activeChannels.begin();it != m_activeChannels.end(); ++it) {
+    for (ChannelList::iterator it = m_activeChannels.begin(); it != m_activeChannels.end(); ++it) {
       (*it)->handleEvent();
     }
     doPendingFunctors();

@@ -6,10 +6,11 @@
 
 // Author: Shuo Chen (chenshuo at chenshuo dot com)
 
-#include <Reactor/EventLoopThreadPool.h>
-#include <Reactor/EventLoop.h>
-#include "EventLoopThread.h"
 #include <Logger/Logger.h>
+#include <Logger/ptr_vector.h>
+#include <Reactor/EventLoop.h>
+#include <Reactor/EventLoopThreadPool.h>
+#include "EventLoopThread.h"
 
 #include <stdio.h>
 
@@ -17,7 +18,7 @@ using namespace TA;
 
 EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const std::string& nameArg, int numThreads)
     : m_baseLoop(baseLoop),
-      m_name(nameArg),
+      _name(nameArg),
       m_started(false),
       m_numThreads(numThreads),
       m_next(0) {
@@ -34,8 +35,8 @@ void EventLoopThreadPool::start() {
   m_started = true;
 
   for (int i = 0; i < m_numThreads; ++i) {
-    char buf[m_name.size() + 32];
-    snprintf(buf, sizeof buf, "%s%d", m_name.c_str(), i);
+    char buf[_name.size() + 32];
+    snprintf(buf, sizeof buf, "%s%d", _name.c_str(), i);
     EventLoopThread* t = new EventLoopThread();
     m_threads.push_back(t);
     m_loops.push_back(t->startLoop());

@@ -1,48 +1,43 @@
 #include <assert.h>
 
-#include <Tcp/TcpConnection.h>
-#include <Reactor/EventLoop.h>
 #include <Logger/Logger.h>
+#include <Reactor/EventLoop.h>
 #include <Socket/SocketHelp.h>
+#include <Tcp/TcpConnection.h>
 
 using namespace TA;
 
 TcpConnection::TcpConnection(EventLoop* loop,
-                const std::string& name,
-                int sockfd,
-                const InetAddress& localAddr,
-                const InetAddress& peerAddr)
-  :p_loop(loop),
-  m_name(name),
-  m_state(kConnecting),
-  p_socket(new Socket(sockfd)),
-  p_channel(new Channel(p_loop, sockfd)),
-  m_localAddr(localAddr),
-  m_peerAddr(peerAddr)
-{
-
+                             const std::string& name,
+                             int sockfd,
+                             const InetAddress& localAddr,
+                             const InetAddress& peerAddr)
+    : p_loop(loop),
+      _name(name),
+      m_state(kConnecting),
+      p_socket(new Socket(sockfd)),
+      p_channel(new Channel(p_loop, sockfd)),
+      m_localAddr(localAddr),
+      m_peerAddr(peerAddr) {
   p_channel->setReadCallBack(std::bind(&TcpConnection::handleRead, this));
   p_channel->setCloseCallBack(std::bind(&TcpConnection::handleClose, this));
 
-  LOG_DEBUG << "TcpConnection::ctor[" <<  m_name << "] at " << this
+  LOG_DEBUG << "TcpConnection::ctor[" << _name << "] at " << this
             << " fd=" << sockfd;
 
   p_socket->setKeepAlive(true);
   //connectEstablished();  do not in Constructor call shared_from_this();
 }
 
-TcpConnection::~TcpConnection()
-{
-  LOG_DEBUG << "TcpConnection::dtor[" << m_name << "] at "
-  << this << " fd=" << p_channel->fd()
-  << " state=" << stateToString();
+TcpConnection::~TcpConnection() {
+  LOG_DEBUG << "TcpConnection::dtor[" << _name << "] at "
+            << this << " fd=" << p_channel->fd()
+            << " state=" << stateToString();
 
   assert(m_state == kDisConnected);
-
 }
 
-void TcpConnection::connectEstablished()
-{
+void TcpConnection::connectEstablished() {
   LOG_TRACE << "TcpConnection::connectEstablished()";
   p_loop->assertInLoopThread();
   assert(m_state == kConnecting);
@@ -54,92 +49,70 @@ void TcpConnection::connectEstablished()
             << m_peerAddr.toIpPort() << " is "
             << (isConnected() ? "UP" : "DOWN");
 
-  if(m_connectionCallBack) m_connectionCallBack(shared_from_this());
-
+  if (m_connectionCallBack) m_connectionCallBack(shared_from_this());
 }
 
-void TcpConnection::send(const void* message, size_t len)
-{
-  if(m_state == kConnected)
-  {
-    if(p_loop->isInloopThread())
-    {
+void TcpConnection::send(const void* message, size_t len) {
+  if (m_state == kConnected) {
+    if (p_loop->isInloopThread()) {
       sendInLoop(message, len);
-    }
-    else
-    {
+    } else {
       p_loop->runInLoop(std::bind(&TcpConnection::sendInLoop, this, message, len));
     }
   }
 }
 
-void TcpConnection::send(const std::string& message)
-{
-  if(m_state == kConnected)
-  {
-    if(p_loop->isInloopThread())
-    {
+void TcpConnection::send(const std::string& message) {
+  if (m_state == kConnected) {
+    if (p_loop->isInloopThread()) {
       sendInLoop(message.data(), message.size());
-    }
-    else
-    {
+    } else {
       p_loop->runInLoop(std::bind(&TcpConnection::sendInLoop, this, message.data(), message.size()));
     }
   }
 }
 
-void TcpConnection::send(Buffer* message)
-{
-  if(m_state == kConnected)
-  {
-    if(p_loop->isInloopThread())
-    {
+void TcpConnection::send(Buffer* message) {
+  if (m_state == kConnected) {
+    if (p_loop->isInloopThread()) {
       sendInLoop(message->peek(), message->readableBytes());
       message->retrieveAll();
-    }
-    else
-    {
+    } else {
       p_loop->runInLoop(std::bind(&TcpConnection::sendInLoop, this, message->peek(), message->readableBytes()));
       message->retrieveAll();
     }
   }
 }
 
-void TcpConnection::sendInLoop(const void* data, size_t len)
-{
+void TcpConnection::sendInLoop(const void* data, size_t len) {
   p_loop->assertInLoopThread();
   ssize_t nwrote = 0;
   size_t remaining = len;
   bool faultError = false;
 
-  if(m_state == kDisConnected)
-  {
+  if (m_state == kDisConnected) {
     LOG_WARN << "disconnected, give up writing.";
-    return ;
+    return;
   }
 
   //if nothing in output Buffer, try writing directly.
-  if(!p_channel->isWriting() && m_outputBuffer.readableBytes() == 0)
-  {
+  if (!p_channel->isWriting() && m_outputBuffer.readableBytes() == 0) {
     nwrote = sockets::write(p_channel->fd(), data, len);
-    if(nwrote >= 0)
-    {
+    if (nwrote >= 0) {
       remaining = len - nwrote;
-      if(remaining == 0 )//&& m_writeCompleteCallBack)
+      if (remaining == 0)  //&& m_writeCompleteCallBack)
       {
         LOG_TRACE << "TcpConnection::sendInLoop() writeCompleteCallBack()";
         //fixd need
         //p_loop->queueInLoop(std::bind())
       }
-    }
-    else // nwrote < 0
+    } else  // nwrote < 0
     {
       nwrote = 0;
-      if(errno != EWOULDBLOCK) // EAGIN
+      if (errno != EWOULDBLOCK)  // EAGIN
       {
         LOG_SYSERR << "TcpConnection::sendInLoop()";
-        if(errno == EPIPE || errno == ECONNRESET)
-        {
+        if (errno == EPIPE || errno == ECONNRESET) {
           faultError = true;
         }
       }
@@ -147,8 +120,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
   }
 
   assert(remaining <= len);
-  if(!faultError && remaining > 0)
-  {
+  if (!faultError && remaining > 0) {
     /*size_t oldLen = m_outputBuffer.readableBytes();
     if(oldLen + remaining >= )
     {
@@ -156,98 +128,76 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
     }*/
 
     m_outputBuffer.append(static_cast<const char*>(data) + nwrote, remaining);
-    if(!p_channel->isWriting())
-    {
+    if (!p_channel->isWriting()) {
       p_channel->enableWriting();
     }
   }
 }
 
-void TcpConnection::shutdown()
-{
-  if(m_state == kConnected)
-  {
+void TcpConnection::shutdown() {
+  if (m_state == kConnected) {
     setState(kDisConnecting);
     p_loop->runInLoop(std::bind(&TcpConnection::shutdownInLoop, this));
   }
 }
 
-void TcpConnection::shutdownInLoop()
-{
+void TcpConnection::shutdownInLoop() {
   p_loop->assertInLoopThread();
-  if(!p_channel->isWriting())
-  {
+  if (!p_channel->isWriting()) {
     p_socket->shutdownWrite();
   }
 }
 
-
-void TcpConnection::handleRead()
-{
+void TcpConnection::handleRead() {
   //LOG_TRACE << "TcpConnection::handleRead()";
 
   int savedErrno = 0;
 
   ssize_t n = m_inputBuffer.readFd(p_channel->fd(), &savedErrno);
-  if(n > 0){
+  if (n > 0) {
     m_messageCallBack(shared_from_this(), &m_inputBuffer, n);
-  }
-  else if ( n==0 ){
+  } else if (n == 0) {
     handleClose();
-  }
-  else
-  {
+  } else {
     errno = savedErrno;
     LOG_SYSERR << "TcpConnection::handleRead()";
     handleError();
   }
 }
 
-void TcpConnection::handleWrite()
-{
+void TcpConnection::handleWrite() {
   LOG_TRACE << "TcpConnection::handleWrite()";
   p_loop->assertInLoopThread();
-  if(p_channel->isWriting())
-  {
+  if (p_channel->isWriting()) {
     ssize_t n = sockets::write(p_channel->fd(), m_outputBuffer.peek(), m_outputBuffer.readableBytes());
 
-    if(n > 0)
-    {
+    if (n > 0) {
       m_outputBuffer.retrieve(n);
-      if(m_outputBuffer.readableBytes() == 0)
-      {
+      if (m_outputBuffer.readableBytes() == 0) {
         p_channel->disableWriting();
-        if(0)//m_writeCompleteCallback)
+        if (0)  //m_writeCompleteCallback)
         {
-
         }
-        if(0)//m_state == kDisConnecting)
+        if (0)  //m_state == kDisConnecting)
         {
-
         }
-      }
-      else
-      {
+      } else {
         LOG_SYSERR << "TcpConnection::handleWrite";
       }
     }
-  }
-  else
-  {
+  } else {
     LOG_ERROR << "Connection fd = " << p_channel->fd()
               << " is down, no more writing";
   }
 }
 
-void TcpConnection::handleError()
-{
+void TcpConnection::handleError() {
   int err = sockets::getSocketError(p_channel->fd());
-  LOG_ERROR << "TcpConnection::handleError [" << m_name
+  LOG_ERROR << "TcpConnection::handleError [" << _name
             << "] - SO_ERROR = " << err << " " << strerror_tl(err);
 }
 
-void TcpConnection::handleClose()
-{
+void TcpConnection::handleClose() {
   LOG_TRACE << "TcpConnection::handleClose()";
   p_loop->assertInLoopThread();
   LOG_TRACE << "fd = " << p_channel->fd() << " state = " << stateToString();
@@ -259,18 +209,15 @@ void TcpConnection::handleClose()
   TcpConnectionPtr guardThis(shared_from_this());
   //LOG_TRACE << "trace conn use " << name() << " used count " << guardThis.use_count();
 
-  m_closeCallBack(guardThis); // to  Tcpserver ConnSet resource.
+  m_closeCallBack(guardThis);  // to  Tcpserver ConnSet resource.
   //LOG_TRACE << "trace conn use " << name() << " used count " << guardThis.use_count();
-
 }
 
-void TcpConnection::connectDestroyed()
-{
+void TcpConnection::connectDestroyed() {
   LOG_TRACE << "TcpConnection::connectDestroyed()";
   p_loop->assertInLoopThread();
 
-  if (m_state == kConnected)
-  {
+  if (m_state == kConnected) {
     setState(kDisConnected);
     p_channel->disableAll();
 
@@ -282,31 +229,25 @@ void TcpConnection::connectDestroyed()
   p_channel->remove();
 }
 
-void TcpConnection::forceClose()
-{
+void TcpConnection::forceClose() {
   LOG_TRACE << "TcpConnection::forceClose()";
   // FIXME: use compare and swap
-  if (m_state == kConnected || m_state == kDisConnecting)
-  {
+  if (m_state == kConnected || m_state == kDisConnecting) {
     setState(kDisConnecting);
     p_loop->queueInLoop(std::bind(&TcpConnection::forceCloseInLoop, shared_from_this()));
   }
 }
 
-void TcpConnection::forceCloseInLoop()
-{
+void TcpConnection::forceCloseInLoop() {
   p_loop->assertInLoopThread();
-  if (m_state == kConnected || m_state == kDisConnecting)
-  {
+  if (m_state == kConnected || m_state == kDisConnecting) {
     // as if we received 0 byte in handleRead();
     handleClose();
   }
 }
 
-const char* TcpConnection::stateToString() const
-{
-  switch (m_state)
-  {
+const char* TcpConnection::stateToString() const {
+  switch (m_state) {
     case kDisConnected:
       return "kDisConnected";
     case kConnecting:

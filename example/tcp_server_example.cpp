@@ -20,7 +20,7 @@ int main() {
   InetAddress localAddr(8080);
   TA::TcpServer tcp_server(&loop, localAddr);
 
-  tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
+  //   tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
   tcp_server.setMessageCallBack(std::bind(on_message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   //tcp_server.setCloseCallBack(std::bind(on_close, std::placeholders::_1));
   tcp_server.start();

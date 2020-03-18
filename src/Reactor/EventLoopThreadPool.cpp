@@ -1,5 +1,5 @@
 // Copyright 2010, Shuo Chen.  All rights reserved.
-// http://code.google.com/p/muduo/
+// http://code.google.com/p/TA/
 //
 // Use of this source code is governed by a BSD-style license
 // that can be found in the License file.
@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 
-using namespace muduo;
+using namespace TA;
 
 EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const std::string& nameArg, int numThreads)
     : m_baseLoop(baseLoop),

@@ -5,7 +5,7 @@
  #include <Logger/TimeStamp.h>
 #include <common/Atomic.h>
 
-namespace muduo {
+namespace TA {
 
 class Timer{
 public:

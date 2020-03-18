@@ -1,12 +1,12 @@
-#ifndef MUDUO_EXAMPLES_SUDOKU_SUDOKU_H
-#define MUDUO_EXAMPLES_SUDOKU_SUDOKU_H
+#ifndef TA_EXAMPLES_SUDOKU_SUDOKU_H
+#define TA_EXAMPLES_SUDOKU_SUDOKU_H
 
 
-#include "muduo/base/Types.h"
-#include "muduo/base/StringPiece.h"
+#include "TA/base/Types.h"
+#include "TA/base/StringPiece.h"
 
-muduo::string solveSudoku(const muduo::StringPiece& puzzle);
+TA::string solveSudoku(const TA::StringPiece& puzzle);
 const int kCells = 81;
 extern const char kNoSolution[];
 
-#endif  // MUDUO_EXAMPLES_SUDOKU_SUDOKU_H
+#endif  // TA_EXAMPLES_SUDOKU_SUDOKU_H

@@ -2,7 +2,7 @@
 
 #include <map>
 
-namespace muduo {
+namespace TA {
   class Buffer;
 }
 
@@ -49,7 +49,7 @@ class HttpResponse
   void setBody(const std::string& body)
   { body_ = body; }
 
-  void appendToBuffer(muduo::Buffer* output) const;
+  void appendToBuffer(TA::Buffer* output) const;
 
  private:
   std::map<std::string, std::string> headers_;

@@ -41,18 +41,6 @@ make
 <!-- - [ ] 封装WebSocket协议 -->
 <!-- - [ ] 封装WebSocket协议 -->
 
-#### TODO PLAN
-
-- [ ] 高并发秒杀案例：1.5day
-	- [ ] http静态服务器
-	- [ ] 秒杀页面
-	- [ ] redis连接与秒杀逻辑
-	- [ ] 压力测试
-- [ ] 即时通讯案例：2day
-	- [ ] http静态服务器
-	- [ ] websocket封装
-	- [ ] 即时通讯
-
 #### 参与贡献
 1.  Fork 本仓库
 2.  新建 Feat_xxx 分支

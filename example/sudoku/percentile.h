@@ -6,7 +6,7 @@ class Percentile
  public:
   Percentile(std::vector<int>& latencies, int infly)
   {
-    stat << "recv " << muduo::Fmt("%6zd", latencies.size()) << " in-fly " << infly;
+    stat << "recv " << TA::Fmt("%6zd", latencies.size()) << " in-fly " << infly;
 
     if (!latencies.empty())
     {
@@ -27,16 +27,16 @@ class Percentile
     }
   }
 
-  const muduo::LogStream::Buffer& report() const
+  const TA::LogStream::Buffer& report() const
   {
     return stat.buffer();
   }
 
-  void save(const std::vector<int>& latencies, muduo::StringArg name) const
+  void save(const std::vector<int>& latencies, TA::StringArg name) const
   {
     if (latencies.empty())
       return;
-    muduo::FileUtil::AppendFile f(name);
+    TA::FileUtil::AppendFile f(name);
     f.append("# ", 2);
     f.append(stat.buffer().data(), stat.buffer().length());
     f.append("\n", 1);
@@ -90,5 +90,5 @@ class Percentile
     return latencies[idx];
   }
 
-  muduo::LogStream stat;
+  TA::LogStream stat;
 };

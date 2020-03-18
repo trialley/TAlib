@@ -1,9 +1,9 @@
 #include "examples/sudoku/sudoku.h"
 
-#include "muduo/base/Logging.h"
-#include "muduo/base/FileUtil.h"
-#include "muduo/net/EventLoop.h"
-#include "muduo/net/TcpClient.h"
+#include "TA/base/Logging.h"
+#include "TA/base/FileUtil.h"
+#include "TA/net/EventLoop.h"
+#include "TA/net/TcpClient.h"
 
 #include <fstream>
 #include <numeric>
@@ -13,8 +13,8 @@
 
 #include <stdio.h>
 
-using namespace muduo;
-using namespace muduo::net;
+using namespace TA;
+using namespace TA::net;
 
 typedef std::vector<string> Input;
 typedef std::shared_ptr<const Input> InputPtr;

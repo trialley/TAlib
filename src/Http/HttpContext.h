@@ -2,7 +2,7 @@
 
 #include "HttpRequest.h"
 
-namespace muduo {
+namespace TA {
   class Buffer;
 }
 
@@ -27,7 +27,7 @@ class HttpContext
   // default copy-ctor, dtor and assignment are fine
 
   // return false if any error
-  bool parseRequest(muduo::Buffer* buf, TimeStamp receiveTime);
+  bool parseRequest(TA::Buffer* buf, TimeStamp receiveTime);
 
   bool gotAll() const
   { return state_ == kGotAll; }

@@ -1,11 +1,11 @@
 #include <async_logging>
-#include <muduo_server>
+#include <TA_server>
 
-void on_connection(const muduo::TcpConnectionPtr& conn) {
+void on_connection(const TA::TcpConnectionPtr& conn) {
   LOG_DEBUG << "new conn from " << conn->peerAddress().toIpPort();
 }
 
-void on_message(const muduo::TcpConnectionPtr& conn, muduo::Buffer* buffer, ssize_t len) {
+void on_message(const TA::TcpConnectionPtr& conn, TA::Buffer* buffer, ssize_t len) {
   LOG_DEBUG << "on message : " << len << " bytes " << buffer->peek();
   conn->send(buffer->peek());
   buffer->retrieve(len);
@@ -14,10 +14,10 @@ void on_message(const muduo::TcpConnectionPtr& conn, muduo::Buffer* buffer, ssiz
 int main() {
   Logger::setLogLevel(Logger::DEBUG);
 
-  muduo::EventLoop loop;
+  TA::EventLoop loop;
 
   InetAddress localAddr(8080);
-  muduo::TcpServer tcp_server(&loop, localAddr);
+  TA::TcpServer tcp_server(&loop, localAddr);
 
   tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
   tcp_server.setMessageCallBack(std::bind(on_message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

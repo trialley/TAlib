@@ -7,16 +7,19 @@
 // Author: Shuo Chen (chenshuo at chenshuo dot com)
 //
 
-#include "HttpServer.h"
+#include<Tcp/TcpServer.h>
+#include <Http/HttpServer.h>
 
-#include <Http/HttpContext.hpp>
-#include <Http/HttpRequest.hpp>
-#include <Http/HttpResponse.hpp>
-#include <Logger/AsyncLogging.hpp>
-
+#include <Http/HttpContext.h>
+#include <Http/HttpRequest.h>
+#include <Http/HttpResponse.h>
+#include <Logger/AsyncLogging.h>
+#include <common/noncopyable.h>
+#include <string>
 using namespace TA;
 using namespace http;
-
+using namespace std;
+class HttpResponse;
 namespace TA {
 namespace net {
 namespace detail {

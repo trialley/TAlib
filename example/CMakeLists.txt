@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.7)
-project (AsyncLogging_test)
+project (AsyncLogging_example)
 
 ###
 # variables
@@ -36,18 +36,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -O3")
 
 
 
-add_executable(example_server  ${SOURCES_DIRECTORY}/example_server.cpp)
-target_link_libraries(example_server TAlib
+add_executable(tcp_server_example  ${SOURCES_DIRECTORY}/tcp_server_example.cpp)
+target_link_libraries(tcp_server_example TAlib
                                      pthread)
 
-add_executable(AsyncLogging_test  ${SOURCES_DIRECTORY}/AsyncLogging_test.cpp)
-target_link_libraries(AsyncLogging_test    TAlib
+add_executable(AsyncLogging_example  ${SOURCES_DIRECTORY}/AsyncLogging_example.cpp)
+target_link_libraries(AsyncLogging_example    TAlib
                                             pthread
                                            )
 
 
-add_executable(httpserver_test ${SOURCES_DIRECTORY}/httpserver.cpp)
-target_link_libraries(httpserver_test    
+add_executable(http_server_example ${SOURCES_DIRECTORY}/http_server_example.cpp)
+target_link_libraries(http_server_example    
 								            TAlib
                                             pthread
                                            )

@@ -30,7 +30,7 @@ class TcpServer {
  private:
   TcpServer& operator=(const TcpServer&);
   TcpServer(const TcpServer&);
-
+  EventLoop* getLoop () const { return p_loop; }
   void newConnetion(int sockfd, const InetAddress& peerAddr);
   void removeConnection(const TcpConnectionPtr& conn);
   void removeConnectionInLoop(const TcpConnectionPtr& conn);

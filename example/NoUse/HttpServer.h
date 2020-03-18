@@ -19,8 +19,7 @@ class HttpServer : noncopyable {
 
   HttpServer(EventLoop* loop,
              const InetAddress& listenAddr,
-             const string& name,
-             TcpServer::Option option = TcpServer::kNoReusePort);
+             const string& name);
 
   EventLoop* getLoop() const { return server_.getLoop(); }
 

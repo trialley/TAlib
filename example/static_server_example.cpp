@@ -4,7 +4,9 @@
 #include <Http/Mimetype.h>
 #include <Logger/Logger.h>
 #include <Reactor/Reactor.h>
+#include <Redis/RedisCache.h>
 #include <Tcp/TcpServer.h>
+#include <cache/LFUCache.h>
 #include <common/TimeStamp.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -20,83 +22,70 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include<Redis/RedisConnect.h>
 using namespace std;
 
 extern char favicon[555];
 // std::map<string, TA::HttpServer::HttpCallback> router;
 
-void staticRequest (const HttpRequest& req, HttpResponse* resp) {
-    LOG_INFO << "Headers " << req.methodString () << " " << req.path ();
-    if (1) {
-        const std::map<string, string>& headers = req.headers ();
-        for (const auto& header : headers) {
-            LOG_INFO << header.first << ": " << header.second;
-        }
-    }
+void staticRequest(const HttpRequest& req, HttpResponse* resp) {
+  LOG_INFO << "Headers " << req.methodString() << " " << req.path();
+  string filepath = string("../www") + req.path().c_str();
+  if (filepath == string("../www/")) {
+    filepath += "index.html";
+  }
+  string path = req.path().c_str();
+  LOG_INFO << filepath;
+  //   if (!(getCache().get(path, outbuffer))) {
+  string context;
+  int dot_pos = filepath.rfind('.');
+  string now = TimeStamp::now().toFormattedString(true);
+  struct stat sbuf;
 
+  if (getCache().get(path, context)) {
+    LOG_WARN << "å†…å­˜ç¼“å­˜";
 
+    resp->setStatusCode(HttpResponse::k200Ok);
+    resp->setStatusMessage("OK");
+    resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
+    resp->addHeader("Server", "Muduo");
+    resp->setBody(context);
+  } else if (RedisCache::getRedisCache()->get(path, context)) {  //ï¿½é»ºï¿½ï¿½
+    LOG_WARN << "redisç¼“å­˜";
+    getCache().set(path, context);
 
+    resp->setStatusCode(HttpResponse::k200Ok);
+    resp->setStatusMessage("OK");
+    resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
+    resp->addHeader("Server", "Muduo");
+    resp->setBody(context);
+  } else if (stat(filepath.c_str(), &sbuf) == 0) {  //ï¿½é±¾ï¿½ï¿½
+    LOG_WARN << "æœªå‘½ä¸­ç¼“å­˜";
+    int src_fd = open(filepath.c_str(), 0, 0);
+    int size = sbuf.st_size;
+    char* src_addr = (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, src_fd, 0);
+    string context = string(src_addr, size);
+    munmap(src_addr, size);
+    close(src_fd);
 
-
-    string filepath = string ("../www") + req.path ().c_str ();
-    string path = req.path ().c_str ();
-    LOG_INFO << filepath;
-    //   if (!(getCache().get(path, outbuffer))) {
-    int src_fd = open (filepath.c_str (), 0, 0);
-    struct stat sbuf;
-    if (stat (filepath.c_str (), &sbuf) == 0) {
-        int size = sbuf.st_size;
-        char* src_addr = (char*)mmap (NULL, size, PROT_READ, MAP_PRIVATE, src_fd, 0);
-        string context (src_addr, size);
-        int dot_pos = req.path ().rfind ('.');
-        string now = TimeStamp::now ().toFormattedString (true);
-        munmap (src_addr, size);
-        close (src_fd);
-
-
-        resp->setStatusCode (HttpResponse::k200Ok);
-        resp->setStatusMessage ("OK");
-        resp->setContentType (Mimetype::getMime (req.path ().substr (dot_pos)));
-        resp->addHeader ("Server", "Muduo");
-        resp->setBody (context);
-
-    } else if (path == "/redis") {
-        string val;
-
-        //´ÓÁ¬½Ó³ØÖÐ»ñÈ¡Ò»¸öÁ¬½Ó
-        shared_ptr<RedisConnect> redis = RedisConnect::Instance ();
-        LOG_INFO << "get pool\n";
-
-        //ÉèÖÃÒ»¸ö¼üÖµ
-        redis->set ("key", "val");
-        LOG_INFO << "set key\n";
-
-        //»ñÈ¡¼üÖµÄÚÈÝ
-        redis->get ("key", val);
-
-        //Ö´ÐÐexpireÃüÁîÉèÖÃ³¬Ê±Ê±¼ä
-        redis->execute ("expire", "key", 60);
-
-        //»ñÈ¡³¬Ê±Ê±¼ä(Óëttl(key)·½·¨µÈ¼Û)
-        redis->execute ("ttl", "key");
-
-        //µ÷ÓÃgetStatus·½·¨»ñÈ¡ttlÃüÁîÖ´ÐÐ½á¹û
-        LOG_INFO<<"³¬Ê±Ê±¼ä£º"<<redis->getStatus();
-
-        //Ö´ÐÐdelÃüÁîÉ¾³ý¼üÖµ
-        redis->execute ("del", "key");
-    }
+    getCache().set(path, context);
+    RedisCache::getRedisCache()->set(path, context);
+    resp->setStatusCode(HttpResponse::k200Ok);
+    resp->setStatusMessage("OK");
+    resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
+    resp->addHeader("Server", "Muduo");
+    resp->setBody(context);
+  }
 }
-int main () {
-    RedisConnect::Setup ("127.0.0.1", 6379);
-
-    Logger::setLogLevel (Logger::TRACE);
-    TA::EventLoop loop;
-    TA::HttpServer httpserver (&loop, InetAddress (80), string ("test"));
-    httpserver.setHttpCallback (staticRequest);
-    httpserver.start ();
-    loop.loop ();
+int main() {
+  getCache().init();
+  Logger::setLogLevel(Logger::INFO);
+  //Logger::setAsync("../test.txt");
+  TA::EventLoop loop;
+  TA::HttpServer httpserver(&loop, InetAddress(80), string("test"));
+  httpserver.setHttpCallback(staticRequest);
+  httpserver.setThreadNum(1);
+  httpserver.start();
+  loop.loop();
 }
 char favicon[555] = {
     '\x89',

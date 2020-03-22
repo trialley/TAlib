@@ -720,7 +720,7 @@ class RedisConnect {
     WSADATA data;
     WSAStartup(MAKEWORD(2, 2), &data);
 #endif
-    RedisConnect* redis = GetTemplate();
+    static RedisConnect* redis = GetTemplate();
 
     redis->host = host;
     redis->port = port;

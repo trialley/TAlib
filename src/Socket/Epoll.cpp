@@ -1,10 +1,10 @@
 #include <assert.h>
 #include <sys/epoll.h>
 
-#include <Reactor/Channel.h>
-#include <Socket/Epoll.h>
-#include <Reactor/EventLoop.h>
 #include <Logger/Logger.h>
+#include <Reactor/Channel.h>
+#include <Reactor/EventLoop.h>
+#include <Socket/Epoll.h>
 
 using namespace TA;
 
@@ -66,7 +66,7 @@ TimeStamp Epoll::poll(int timeoutMs, ChannelList* activeChannels) {
   } else if (numEvents == 0) {
     LOG_TRACE << " nothing happended";
   } else {
-    LOG_ERROR << "Epoll::epoll_wait()";
+    LOG_ERROR << "Epoll::epoll_wait()" << numEvents << "  " << strerror(errno);
   }
 
   return now;

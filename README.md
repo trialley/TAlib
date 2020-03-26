@@ -9,6 +9,7 @@
 git clone https://github.com/trialley/TAlib.git
 # 或者git clone https://gitee.com/trialley/TAlib.git
 
+
 cd TAlib
 mkdir build
 cd build
@@ -21,7 +22,7 @@ make
 
 1. 异步日志系统
 2. TCP协议封装
-3. HTTP协议封装
+3. HTTP协议封装，Redis与LRU缓存
 4. 使用tcmalloc进行高并发内存分配
 5. 线程池
 6. Reactor模式
@@ -29,7 +30,6 @@ make
 
 
 #### TODO
-- [ ] 重新添加内存池
 - [x] HTTP静态服务器
 - [ ] 进行内存池性能测试
 - [ ] 封装UDP协议
@@ -42,9 +42,6 @@ make
 	- [ ] 秒杀页面
 	- [ ] redis连接与秒杀逻辑
 	- [ ] 压力测试
-- [ ] 即时通讯案例
-	- [ ] websocket封装
-	- [ ] 即时通讯逻辑
 
 
 #### 参与贡献

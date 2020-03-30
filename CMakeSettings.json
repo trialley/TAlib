@@ -1,7 +1,7 @@
 ﻿{
   "configurations": [
     {
-      "name": "WSL-Debug",
+      "name": "WSL-GCC-Debug",
       "generator": "Unix Makefiles",
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",

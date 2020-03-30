@@ -49,15 +49,15 @@ void staticRequest(const HttpRequest& req, HttpResponse* resp) {
     resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
     resp->addHeader("Server", "Muduo");
     resp->setBody(context);
-  } else if (RedisCache::getRedisCache()->get(path, context)) {  //�黺��
-    LOG_WARN << "redis缓存";
-    getCache().set(path, context);
+  //} else if (RedisCache::getRedisCache()->get(path, context)) {  //�黺��
+  //  LOG_WARN << "redis缓存";
+  //  getCache().set(path, context);
 
-    resp->setStatusCode(HttpResponse::k200Ok);
-    resp->setStatusMessage("OK");
-    resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
-    resp->addHeader("Server", "Muduo");
-    resp->setBody(context);
+  //  resp->setStatusCode(HttpResponse::k200Ok);
+  //  resp->setStatusMessage("OK");
+  //  resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
+  //  resp->addHeader("Server", "Muduo");
+  //  resp->setBody(context);
   } else if (stat(filepath.c_str(), &sbuf) == 0) {  //�鱾��
     LOG_WARN << "未命中缓存";
     int src_fd = open(filepath.c_str(), 0, 0);

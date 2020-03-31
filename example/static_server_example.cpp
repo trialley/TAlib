@@ -23,14 +23,29 @@
 #include <cstring>
 #include <string>
 using namespace std;
-
+void currentdir(){
+   char szBuf[128];
+    char szPath[128];
+    
+    memset(szBuf, 0x00, sizeof( szBuf));    
+    memset( szPath, 0x00, sizeof(szPath));
+ 
+    getcwd(szBuf, sizeof(szBuf)-1);
+    printf("buf:%s\n", szBuf);
+ 
+    int ret =  readlink("/proc/self/exe", szPath, sizeof(szPath)-1 );
+    printf("ret:%d\n", ret);
+    printf("path:%s\n", szPath);
+ 
+    return;
+}
 extern char favicon[555];
 // std::map<string, TA::HttpServer::HttpCallback> router;
 
 void staticRequest(const HttpRequest& req, HttpResponse* resp) {
   LOG_INFO << "Headers " << req.methodString() << " " << req.path();
-  string filepath = string("../www") + req.path().c_str();
-  if (filepath == string("../www/")) {
+  string filepath = string("./www") + req.path().c_str();
+  if (filepath == string("./www/")) {
     filepath += "index.html";
   }
   string path = req.path().c_str();
@@ -68,20 +83,25 @@ void staticRequest(const HttpRequest& req, HttpResponse* resp) {
     close(src_fd);
 
     getCache().set(path, context);
-    RedisCache::getRedisCache()->set(path, context);
+    // RedisCache::getRedisCache()->set(path, context);
     resp->setStatusCode(HttpResponse::k200Ok);
     resp->setStatusMessage("OK");
     resp->setContentType(Mimetype::getMime(filepath.substr(dot_pos)));
     resp->addHeader("Server", "Muduo");
     resp->setBody(context);
+  }else{
+    LOG_WARN << "no file";
+
   }
+
 }
 int main() {
+  currentdir();
   getCache().init();
   Logger::setLogLevel(Logger::INFO);
   //Logger::setAsync("../test.txt");
   TA::EventLoop loop;
-  TA::HttpServer httpserver(&loop, InetAddress(80), string("test"));
+  TA::HttpServer httpserver(&loop, InetAddress("127.0.0.1",80), string("test"));
   httpserver.setHttpCallback(staticRequest);
   httpserver.setThreadNum(1);
   httpserver.start();

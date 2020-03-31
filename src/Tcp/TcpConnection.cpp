@@ -201,7 +201,7 @@ void TcpConnection::handleClose() {
   LOG_TRACE << "TcpConnection::handleClose()";
   p_loop->assertInLoopThread();
   LOG_TRACE << "fd = " << p_channel->fd() << " state = " << stateToString();
-  assert(m_state == kConnected || m_state == kDisConnecting);
+  // assert(m_state == kConnected || m_state == kDisConnecting);
 
   setState(kDisConnected);
   p_channel->disableAll();

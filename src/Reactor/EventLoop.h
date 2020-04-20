@@ -1,24 +1,24 @@
 #ifndef _NET_EVENTLOOP_H
 #define _NET_EVENTLOOP_H
 
-#include <memory>
-#include <vector>
+#include <Reactor/Channel.h>
+#include <Reactor/CurrentThread.h>
+#include <common/CallBacks.h>
+#include <common/TimeStamp.h>
+
 #include <functional>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 #include "TimerId.h"
- #include <common/TimeStamp.h>
 #include "TimerQueue.h"
-#include <common/CallBacks.h>
-#include <Reactor/CurrentThread.h>
-#include <Reactor/Channel.h>
 
 namespace TA {
 
 class Poller;
 
-class EventLoop
-{
+class EventLoop {
 public:
 	typedef std::function<void()> Functor;
 
@@ -31,7 +31,7 @@ public:
 	bool isInloopThread() const;
 
 	void updateChannel(Channel* channel);
-  void removeChannel(Channel* channel);
+	void removeChannel(Channel* channel);
 
 	TimerId runAt(const TimeStamp& time, const NetCallBacks::TimerCallBack& cb);
 	TimerId runAfter(double delay, const NetCallBacks::TimerCallBack& cb);
@@ -39,7 +39,7 @@ public:
 
 	void runInLoop(const Functor& cb);
 	void wakeup();
-  void queueInLoop(const Functor& cb);
+	void queueInLoop(const Functor& cb);
 
 	static EventLoop* getEventLoopOfCurrentThread();
 
@@ -49,8 +49,8 @@ private:
 
 	void abortNotInLoopThread();
 
-  //used to waked up
-  void handleRead();
+	//used to waked up
+	void handleRead();
 	void doPendingFunctors();
 
 	//used for loop to debug.
@@ -65,14 +65,13 @@ private:
 	std::unique_ptr<TimerQueue> m_timerQueue;
 	ChannelList m_activeChannels;
 
-	int m_wakeupFd;//... 放p_wakeupChannel 后面会出错,一定要按顺序来.
+	int m_wakeupFd;	 //... 放p_wakeupChannel 后面会出错,一定要按顺序来.
 	std::unique_ptr<Channel> p_wakeupChannel;
 	mutable std::mutex m_mutex;
-  bool m_callingPendingFunctors; /* atomic */
-  std::vector<Functor> m_pendingFunctors; // @GuardedBy mutex_
-
+	bool m_callingPendingFunctors;			 /* atomic */
+	std::vector<Functor> m_pendingFunctors;	 // @GuardedBy mutex_
 };
 
-}
+}  // namespace TA
 
 #endif

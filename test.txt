@@ -1,1 +1,3 @@
-http://127.0.0.1/
+http://127.0.0.1/2020-04-20 25:50:11.434349 [1;32m[INFO ][0;39m  [pid:1479] [tid:1479] [EventLoop.cpp:40] [EventLoop] [1;32m|[0;39mEventLoop Create 0x7FFFFFFEE630 in thread 1479
+2020-04-20 25:50:11.435539 [1;33m[WARN ][0;39m  [pid:1479] [tid:1479] [HttpServer.cpp:38] [start] [1;33m|[0;39mHttpServer[test] starts listenning on 127.0.0.1:80
+2020-04-20 25:50:11.437508 [1;32m[INFO ][0;39m  [pid:1479] [tid:1484] [EventLoop.cpp:40] [EventLoop] [1;32m|[0;39mEventLoop Create 0x7FFFFD1FE890 in thread 1484

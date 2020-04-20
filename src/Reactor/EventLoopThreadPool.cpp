@@ -10,71 +10,71 @@
 #include <Logger/ptr_vector.h>
 #include <Reactor/EventLoop.h>
 #include <Reactor/EventLoopThreadPool.h>
-#include "EventLoopThread.h"
-
 #include <stdio.h>
+
+#include "EventLoopThread.h"
 
 using namespace TA;
 
 EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const std::string& nameArg, int numThreads)
-    : m_baseLoop(baseLoop),
-      _name(nameArg),
-      m_started(false),
-      m_numThreads(numThreads),
-      m_next(0) {
+	: m_baseLoop(baseLoop),
+	  _name(nameArg),
+	  m_started(false),
+	  m_numThreads(numThreads),
+	  m_next(0) {
 }
 
 EventLoopThreadPool::~EventLoopThreadPool() {
-  // Don't delete loop, it's stack variable
+	// Don't delete loop, it's stack variable
 }
 
 void EventLoopThreadPool::start() {
-  assert(!m_started);
-  m_baseLoop->assertInLoopThread();
+	assert(!m_started);
+	m_baseLoop->assertInLoopThread();
 
-  m_started = true;
+	m_started = true;
 
-  for (int i = 0; i < m_numThreads; ++i) {
-    char buf[_name.size() + 32];
-    snprintf(buf, sizeof buf, "%s%d", _name.c_str(), i);
-    EventLoopThread* t = new EventLoopThread();
-    m_threads.push_back(t);
-    m_loops.push_back(t->startLoop());
-  }
+	for (int i = 0; i < m_numThreads; ++i) {
+		char buf[_name.size() + 32];
+		snprintf(buf, sizeof buf, "%s%d", _name.c_str(), i);
+		EventLoopThread* t = new EventLoopThread();
+		m_threads.push_back(t);
+		m_loops.push_back(t->startLoop());
+	}
 }
 
 EventLoop* EventLoopThreadPool::getNextLoop() {
-  m_baseLoop->assertInLoopThread();
-  assert(m_started);
-  EventLoop* loop = m_baseLoop;
+	m_baseLoop->assertInLoopThread();
+	assert(m_started);
+	EventLoop* loop = m_baseLoop;
 
-  if (!m_loops.empty()) {
-    // round-robin
-    loop = m_loops[m_next];
-    ++m_next;
-    if (static_cast<size_t>(m_next) >= m_loops.size()) {
-      m_next = 0;
-    }
-  }
-  return loop;
+	if (!m_loops.empty()) {
+		// round-robin
+		loop = m_loops[m_next];
+		++m_next;
+		if (static_cast<size_t>(m_next) >= m_loops.size()) {
+			m_next = 0;
+		}
+	}
+	return loop;
 }
 
 EventLoop* EventLoopThreadPool::getLoopForHash(size_t hashCode) {
-  m_baseLoop->assertInLoopThread();
-  EventLoop* loop = m_baseLoop;
+	m_baseLoop->assertInLoopThread();
+	EventLoop* loop = m_baseLoop;
 
-  if (!m_loops.empty()) {
-    loop = m_loops[hashCode % m_loops.size()];
-  }
-  return loop;
+	if (!m_loops.empty()) {
+		loop = m_loops[hashCode % m_loops.size()];
+	}
+	return loop;
 }
 
 std::vector<EventLoop*> EventLoopThreadPool::getAllLoops() {
-  m_baseLoop->assertInLoopThread();
-  assert(m_started);
-  if (m_loops.empty()) {
-    return std::vector<EventLoop*>(1, m_baseLoop);
-  } else {
-    return m_loops;
-  }
+	m_baseLoop->assertInLoopThread();
+	assert(m_started);
+	if (m_loops.empty()) {
+		return std::vector<EventLoop*>(1, m_baseLoop);
+	} else {
+		return m_loops;
+	}
 }

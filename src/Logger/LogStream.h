@@ -2,38 +2,37 @@
 #define _LOG_STREAM_HH
 #include <stdio.h>
 #include <string.h>
+
 #include <string>
 
 const int kSmallBuffer = 4096;
-const int kLargeBuffer = 4096*1000;
+const int kLargeBuffer = 4096 * 1000;
 
-template<int SIZE>
-class LogBuffer
-{
+template <int SIZE>
+class LogBuffer {
 public:
-	LogBuffer(): m_cur(m_data){
+	LogBuffer() : m_cur(m_data) {
 	}
 
-	~LogBuffer(){
+	~LogBuffer() {
 		//printf("%s", m_data);
 	}
 
-	void append(const char* /*restrict*/ buf, std::size_t len){
-	// append partially
-		if (/*implicit_cast<std::size_t>*/(avail()) > len)
-		{
+	void append(const char* /*restrict*/ buf, std::size_t len) {
+		// append partially
+		if (/*implicit_cast<std::size_t>*/ (avail()) > len) {  //直接cpy
 			memcpy(m_cur, buf, len);
 			m_cur += len;
 		}
 	}
 
 	// write in m_data directly
-	char* current() {  return m_cur; };
-	std::size_t avail() const { return static_cast<std::size_t> (end() - m_cur); }
+	char* current() { return m_cur; };
+	std::size_t avail() const { return static_cast<std::size_t>(end() - m_cur); }  //获取剩余长度
 	void add(std::size_t len) { m_cur += len; }
-	std::size_t length() const {return m_cur - m_data;}
+	std::size_t length() const { return m_cur - m_data; }
 	void bzero() { ::bzero(m_data, sizeof(m_data)); }
-	void reset() {m_cur = m_data;}
+	void reset() { m_cur = m_data; }
 
 	const char* data() const { return m_data; }
 
@@ -44,7 +43,7 @@ private:
 	char* m_cur;
 };
 
-class LogStream{
+class LogStream {
 public:
 	LogStream();
 	~LogStream();
@@ -68,7 +67,7 @@ public:
 	self& operator<<(double);
 
 	self& operator<<(char v);
-	self& operator<<(const char *);
+	self& operator<<(const char*);
 
 	self& operator<<(const std::string& s);
 
@@ -76,20 +75,19 @@ public:
 	const Buffer& buffer() const { return m_buffer; }
 
 private:
-	LogStream(const LogStream& ls);			//no copyable
+	LogStream(const LogStream& ls);	 //no copyable
 	LogStream& operator=(const LogStream& ls);
 
-	template<typename T>
+	template <typename T>
 	void formatInteger(T v);
 
 	Buffer m_buffer;
 	static const std::size_t kMaxNumericSize = 32;
-
 };
 
-class Fmt{
+class Fmt {
 public:
-	template<typename T>
+	template <typename T>
 	Fmt(const char* fmt, T val);
 
 	const char* data() const { return m_buf; }
@@ -100,7 +98,7 @@ private:
 	int m_length;
 };
 
-inline LogStream& operator<<(LogStream &s, const Fmt& fmt){
+inline LogStream& operator<<(LogStream& s, const Fmt& fmt) {
 	s.append(fmt.data(), fmt.length());
 	return s;
 }

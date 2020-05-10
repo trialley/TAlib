@@ -12,7 +12,7 @@ class EventLoop;
  *因此每个Channel对象都只属于某一个IO线程。 每个Channel对象自始至
  *终只负责一个文件描述符（fd） 的IO事件分发， 但它并不拥有这个fd，
  *也不会在析构的时候关闭这个fd。 Channel会把不同的IO事件分发为不
- *同的回调， 例如ReadCallback、 WriteCallback等
+ *同的回调， 例如ReadCallback、 WriteCallback等！！！
  */
 
 class Channel {

@@ -17,10 +17,10 @@ int main() {
 	Logger::setLogLevel(Logger::DEBUG);
 	//Logger::setAsync (true);
 
-	TA::EventLoop loop;
+	TA::EventLoop loop;	 //负责管理整个epoll及数据读写
 	TA::TcpServer tcp_server(&loop, InetAddress(8080));
 
-	//   tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
+	tcp_server.setConnectionCallBack(std::bind(on_connection, std::placeholders::_1));
 	tcp_server.setMessageCallBack(std::bind(on_message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	//tcp_server.setCloseCallBack(std::bind(on_close, std::placeholders::_1));
 	tcp_server.startListen();

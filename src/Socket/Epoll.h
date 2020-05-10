@@ -1,11 +1,11 @@
 #ifndef _NET_EPOLL_HH
 #define _NET_EPOLL_HH
 
-#include <vector>
-#include <map>
-
- #include <common/TimeStamp.h>
 #include <Reactor/Poller.h>
+#include <common/TimeStamp.h>
+
+#include <map>
+#include <vector>
 
 /*
  *#include <sys/poll.h>
@@ -26,30 +26,30 @@ class EventLoop;
 
 class Epoll : public Poller {
 public:
-  Epoll(EventLoop* loop);
-  ~Epoll();
+	Epoll(EventLoop* loop);
+	~Epoll();
 
-  TimeStamp poll(int timeoutMs, ChannelList* activeChannels);
+	TimeStamp poll(int timeoutMs, ChannelList* activeChannels);
 
-  void updateChannel(Channel* channel);
-  void removeChannel(Channel* channel);
+	void updateChannel(Channel* channel);
+	void removeChannel(Channel* channel);
 
 private:
-  const Epoll& operator=(const Epoll&);
-  Epoll(const Epoll&);
+	const Epoll& operator=(const Epoll&);
+	Epoll(const Epoll&);
 
-  static const int kMaxEpollConcurrencySize;
-  static const int kInitEpollEventsSize;
+	static const int kMaxEpollConcurrencySize;
+	static const int kInitEpollEventsSize;
 
-  void fillActiveChannels(int numEvents, ChannelList* activeChannels) const;
+	void fillActiveChannels(int numEvents, ChannelList* activeChannels) const;
 
-  typedef std::vector<struct epoll_event> EpollFdList;
+	typedef std::vector<struct epoll_event> EpollFdList;
 
-  int m_epfd;
-  std::size_t m_maxEventsSize;
-  EpollFdList m_epollEvents;
+	int m_epfd;
+	std::size_t m_maxEventsSize;
+	EpollFdList m_epollEvents;
 };
 
-}
+}  // namespace TA
 
 #endif

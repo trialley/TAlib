@@ -1,72 +1,61 @@
+#include <Logger/Logger.h>
+#include <Reactor/Acceptor.h>
+#include <Reactor/EventLoop.h>
+#include <Socket/InetAddress.h>
+#include <Socket/SocketHelp.h>
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <assert.h>
-#include <functional>
 
-#include <Socket/SocketHelp.h>
-#include <Socket/InetAddress.h>
-#include <Reactor/EventLoop.h>
-#include <Logger/Logger.h>
-#include <Reactor/Acceptor.h>
+#include <functional>
 
 using namespace TA;
 
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reuseport)
-  :p_loop(loop),
-  m_acceptSocket(sockets::createNonblockingOrDie(listenAddr.family())),
-  m_acceptChannel(loop, m_acceptSocket.fd()),
-  m_listenning(false),
-  m_idleFd(::open("/dev/null", O_RDONLY | O_CLOEXEC))
-{
-  assert(m_idleFd >= 0);
-  m_acceptSocket.setReuseAddr(reuseport);
-  m_acceptSocket.bindAddress(listenAddr);
-  m_acceptChannel.setReadCallBack(
-    std::bind(&Acceptor::handleRead, this));
+	: p_loop(loop),
+	  m_acceptSocket(sockets::createNonblockingOrDie(listenAddr.family())),
+	  m_acceptChannel(loop, m_acceptSocket.fd()),
+	  m_listenning(false),
+	  m_idleFd(::open("/dev/null", O_RDONLY | O_CLOEXEC)) {
+	assert(m_idleFd >= 0);
+	m_acceptSocket.setReuseAddr(reuseport);
+	m_acceptSocket.bindAddress(listenAddr);
+	m_acceptChannel.setReadCallBack(
+		std::bind(&Acceptor::handleRead, this));
 }
 
-Acceptor::~Acceptor()
-{
-  m_acceptChannel.disableAll();
-  m_acceptChannel.remove();
-  ::close(m_idleFd);
+Acceptor::~Acceptor() {
+	m_acceptChannel.disableAll();
+	m_acceptChannel.remove();
+	::close(m_idleFd);
 }
 
-void Acceptor::listen()
-{
-  p_loop->assertInLoopThread();
-  m_listenning = true;
-  m_acceptSocket.listen();
-  m_acceptChannel.enableReading();
+void Acceptor::listen() {
+	p_loop->assertInLoopThread();
+	m_listenning = true;
+	m_acceptSocket.listen();
+	m_acceptChannel.enableReading();
 }
 
-void Acceptor::handleRead()
-{
-  LOG_TRACE << "Acceptor::handleRead()";
-  p_loop->assertInLoopThread();
-  InetAddress peerAddr;
-  int connfd = m_acceptSocket.accept(&peerAddr);
-  if(connfd >= 0)
-  {
-    if(m_newConnectionCallBack)
-    {
-      m_newConnectionCallBack(connfd, peerAddr);
-    }
-    else
-    {
-      sockets::close(connfd);
-    }
-  }
-  else
-  {
-    LOG_ERROR << "in Acceptor::handleRead";
-    if(errno == EMFILE)
-    {
-      ::close(m_idleFd);
-      m_idleFd = ::accept(m_acceptSocket.fd(), NULL, NULL);
-      ::close(m_idleFd);
-      m_idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
-    }
-  }
+void Acceptor::handleRead() {
+	LOG_TRACE << "Acceptor::handleRead()";
+	p_loop->assertInLoopThread();
+	InetAddress peerAddr;
+	int connfd = m_acceptSocket.accept(&peerAddr);
+	if (connfd >= 0) {
+		if (m_newConnectionCallBack) {
+			m_newConnectionCallBack(connfd, peerAddr);	//由tcpserver的函数负责分配该连接出去
+		} else {
+			sockets::close(connfd);
+		}
+	} else {
+		LOG_ERROR << "in Acceptor::handleRead";
+		if (errno == EMFILE) {
+			::close(m_idleFd);
+			m_idleFd = ::accept(m_acceptSocket.fd(), NULL, NULL);
+			::close(m_idleFd);
+			m_idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+		}
+	}
 }

@@ -12,7 +12,7 @@ public:
 	StringArg(const std::string& str):m_str(str.c_str()){
 	}
 
-	const char* c_str() const{ return m_str;}
+			const char* c_str() const{ return m_str;}
 
 private:
 	const char* m_str;

@@ -1,4 +1,3 @@
-# 公共股部分
 cmake_minimum_required (VERSION 2.8.7)
 project (TAlib)
 
@@ -38,7 +37,7 @@ foreach(dir ${TALIB__DIRECTORY})
   set(talib_sources ${s_${dir}} ${h_${dir}})
 endforeach()
 add_library(TAlib ${talib_sources})
-target_link_libraries(TAlib pthread mysqlclient  tcmalloc )
+target_link_libraries(TAlib pthread mysqlclient   )
 # 测试程序部分
 
 add_subdirectory(${EXAMPLE_DIRECTORY}/)

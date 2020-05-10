@@ -7,7 +7,7 @@
 
 using namespace TA;
 
-namespace EventFd {
+namespace EventFd {	 //命名空间EventFd包含了一些epoll函数的封装
 
 int createEpollFd() {
 	int epfd = epoll_create1(EPOLL_CLOEXEC);

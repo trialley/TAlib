@@ -1,41 +1,38 @@
 #ifndef _TIMER_ID_HH
 #define _TIMER_ID_HH
+#include <stdint.h>
+
 #include <cstdio>
-
 namespace TA {
-
 class Timer;
 
 ///
 /// An opaque identifier, for canceling Timer.
 ///
-class TimerId
-{
- public:
-  TimerId()
-    : m_timer(NULL),
-      m_sequence(0)
-  {
-  }
+class TimerId {
+public:
+	TimerId()
+		: m_timer(NULL),
+		  m_sequence(0) {
+	}
 
-  TimerId(Timer* timer, int64_t seq)
-    : m_timer(timer),
-      m_sequence(seq)
-  {
-  }
+	TimerId(Timer* timer, int64_t seq)
+		: m_timer(timer),
+		  m_sequence(seq) {
+	}
 
-  // default copy-ctor, dtor and assignment are okay
+	// default copy-ctor, dtor and assignment are okay
 
-  friend class TimerQueue;
+	friend class TimerQueue;
 
- private:
-  //TimerId& operator=(const TimerId&);
-  //TimerId(const TimerId&);
+private:
+	//TimerId& operator=(const TimerId&);
+	//TimerId(const TimerId&);
 
-  Timer* m_timer;
-  int64_t m_sequence;
+	Timer* m_timer;
+	int64_t m_sequence;
 };
 
-}
+}  // namespace TA
 
 #endif

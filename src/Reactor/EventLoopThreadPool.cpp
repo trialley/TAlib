@@ -27,7 +27,7 @@ EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const std::string&
 EventLoopThreadPool::~EventLoopThreadPool() {
 	// Don't delete loop, it's stack variable
 }
-
+//启动过程，就是初始化所有线程对象
 void EventLoopThreadPool::start() {
 	assert(!m_started);
 	m_baseLoop->assertInLoopThread();

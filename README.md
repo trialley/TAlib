@@ -2,7 +2,8 @@
 
 #### 介绍
 
-
+#### 环境
+libmysqld-dev
 #### 运行DEMO
 
 ```bash

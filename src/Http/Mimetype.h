@@ -2,14 +2,15 @@
 
 #include <pthread.h>
 #include <map>
+#include <string>
+class Mimetype
+{
+private:
+	static pthread_once_t once_control;
+	static std::map<std::string, std::string> mime;
+	static void init();
+	Mimetype();
 
-class Mimetype {
- private:
-  static pthread_once_t once_control;
-  static std::map<std::string, std::string> mime;
-  static void init();
-  Mimetype();
-
- public:
-  static std::string getMime(const std::string &suffix);
+public:
+	static std::string getMime(const std::string &suffix);
 };

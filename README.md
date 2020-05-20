@@ -3,7 +3,8 @@
 #### 介绍
 
 #### 环境
-libmysqld-dev
+libmysqld-dev  libmysqlclient sudo pacman -Sy mysql-clients
+libtcmalloc-minimal4
 #### 运行DEMO
 
 ```bash
